@@ -1,13 +1,8 @@
 build: false
 
 environment:
-  matrix:
-    - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.8"
-      PYTHON_ARCH: "32"
-      MINICONDA: C:\Miniconda
 
-    - PYTHON: "C:\\Python35"
+  - PYTHON: "C:\\Python35"
       PYTHON_VERSION: "3.5.1"
       PYTHON_ARCH: "32"
       MINICONDA: C:\Miniconda35
@@ -28,4 +23,4 @@ install:
 test_script:
   - mkdir for_test
   - cd for_test
-  - py.test --pyargs shablona --cov-report term-missing --cov=shablona
+  - py.test --pyargs kmpy --cov-report term-missing --cov=kmpy

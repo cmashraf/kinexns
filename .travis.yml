@@ -23,8 +23,8 @@ install:
   #- conda info -a
 
   # Replace dep1 dep2 ... with your dependencies
-  - conda create -n kmpy python=3.6
-  - source activate kmpy
+  #- conda create -n kmpy python=3.6
+  #- source activate kmpy
   - pip install $PIP_DEPS
   - pip install -r requirements.txt
   - pip install -e .

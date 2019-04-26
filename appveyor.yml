@@ -1,11 +1,13 @@
-build: false
+language: python
+sudo: false
 
-environment:
+env:
+  global:
+  - PIP_DEPS="pytest coveralls pytest-cov flake8"
+  - PIP_DEPS="pytest==3.6 coveralls pytest-cov flake8"  
 
-  - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "3.5.1"
-      PYTHON_ARCH: "32"
-      MINICONDA: C:\Miniconda35
+python:
+- '3.6'
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"

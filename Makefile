@@ -8,5 +8,5 @@ flake8:
 	fi;
 	@echo "flake8 passed"
 
-test:
-	py.test --pyargs mlchemsys --cov-report term-missing --cov=mlchemsys
+#test:
+#	py.test --pyargs mlchemsys --cov-report term-missing --cov=mlchemsys

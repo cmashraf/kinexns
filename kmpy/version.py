@@ -30,9 +30,9 @@ description = "shablona: a template for small scientific Python projects"
 # Long description will go up on the pypi page
 long_description = """
 
-Shablona
+kmpy
 ========
-Shablona is a template project for small scientific Python projects.
+kmpy is a tool to build kinetic models with given reaction mechanism and optimize the model parameters by solving ODEs.
 
 It contains software implementations of an analysis of some simple data, but
 more importantly, it contains infrastructure for testing, documentation,
@@ -56,20 +56,20 @@ Copyright (c) 2015--, Ariel Rokem, The University of Washington
 eScience Institute.
 """
 
-NAME = "shablona"
-MAINTAINER = "Ariel Rokem"
-MAINTAINER_EMAIL = "arokem@gmail.com"
-DESCRIPTION = description
+NAME = "kmpy"
+MAINTAINER = "Chowdhury Ashraf"
+MAINTAINER_EMAIL = "cmashraf@uw.edu"
+DESCRIPTION = "Building and optimizing kinetic models for bio-fule pyrolysis"
 LONG_DESCRIPTION = long_description
-URL = "http://github.com/uwescience/shablona"
+URL = "https://github.com/cmashraf/kmpy"
 DOWNLOAD_URL = ""
 LICENSE = "MIT"
-AUTHOR = "Ariel Rokem"
-AUTHOR_EMAIL = "arokem@gmail.com"
+AUTHOR = "Chowdhury Ashraf"
+AUTHOR_EMAIL = "cmashraf@uw.edu"
 PLATFORMS = "OS Independent"
 MAJOR = _version_major
 MINOR = _version_minor
 MICRO = _version_micro
 VERSION = __version__
-PACKAGE_DATA = {'shablona': [pjoin('data', '*')]}
+PACKAGE_DATA = {'kmpy': [pjoin('data', '*')]}
 REQUIRES = ["numpy"]

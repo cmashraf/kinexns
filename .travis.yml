@@ -9,9 +9,6 @@ env:
 python:
 - '3.6'
 
-init:
-  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"
-
 install:
 - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the

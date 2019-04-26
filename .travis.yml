@@ -33,7 +33,7 @@ script:
   # Your test script goes here
   - mkdir for_test
   - cd for_test
-  - py.test --pyargs kmpy --cov-report term-missing --cov=kmpy
+  #- py.test --pyargs kmpy --cov-report term-missing --cov=kmpy
 
 after_success:
   - coveralls

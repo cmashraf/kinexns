@@ -1,6 +1,6 @@
-import os, sys
-import numpy as np
-from constants import GAS_CONST, MW
+import os
+#import numpy as np
+#from constants import GAS_CONST, MW
 
 
 def set_paths():

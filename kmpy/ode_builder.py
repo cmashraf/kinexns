@@ -78,3 +78,42 @@ class Reaction(object):
                 self.uniqueSpeciesList.append(spec.split('_')[1].split()[0])
             #print(spec.split('_')[1].split()[0])
         return self.uniqueSpeciesList
+
+
+def build_species_list(reaction_file):
+    """
+    Build reactnat and product list for each reaction. Also builds a list
+    of unique species in the mechanism
+    Parameters
+    ----------
+    reaction_file       : str
+                           path to the file `complete_reaction_list.dat`
+    Returns
+    __________
+
+    reactant_list       : list
+                         a list of the reactants and their stoichiometric
+                         coeffs for each reaction
+    product_list        : list
+                         a list of the products and their stoichiometric
+                         coeffs for each reaction
+    species_list        : list
+                        a list of unique species in the mechanism
+    """ 
+
+    #initializing reactant, product and unique species list
+    reactant_list = []
+    product_list = []
+    species_name = []
+
+    for line in open(reaction_file, 'r').readlines():
+        reac = Reaction()
+        reactant_list.append(reac.getReactantsName(line))
+        product_list.append(reac.getProductsName(line))
+        current_species = species_name
+        #print(current_species)
+        species_list = reac.uniqueSpeciesName(line, current_species)
+        #print(species_name)
+    species_list.sort()
+
+    return reactant_list, product_list, species_list

@@ -7,7 +7,7 @@ env:
   - PIP_DEPS="pytest==3.6 coveralls pytest-cov flake8"  
 
 python:
-- '3.7'
+- '3.6'
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"

@@ -59,7 +59,7 @@ eScience Institute.
 NAME = "kmpy"
 MAINTAINER = "Chowdhury Ashraf"
 MAINTAINER_EMAIL = "cmashraf@uw.edu"
-DESCRIPTION = "Building and optimizing kinetic models for bio-fule pyrolysis"
+DESCRIPTION = "Building and optimizing kinetic models for bio-fuel pyrolysis"
 LONG_DESCRIPTION = long_description
 URL = "https://github.com/cmashraf/kmpy"
 DOWNLOAD_URL = ""

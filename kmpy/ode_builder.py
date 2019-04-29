@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from constants import GAS_CONST
+from .constants import GAS_CONST
 
 
 def set_paths():

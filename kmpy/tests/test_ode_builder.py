@@ -5,10 +5,10 @@
 import unittest
 
 import numpy as np
-from kmpy import ode_builder
-from kmpy.constants import GAS_CONST
+from ..ode_builder import set_paths
+from ..constants import GAS_CONST
 
-paths = ode_builder.set_paths()
+paths = set_paths()
 
 
 class TestSetPaths(unittest.TestCase):

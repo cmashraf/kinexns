@@ -7,6 +7,8 @@ ver_file = os.path.join('kmpy', 'version.py')
 with open(ver_file) as f:
     exec(f.read())
 
+#HERE = path.abspath(path.dirname(__file__))
+
 opts = dict(name=NAME,
             maintainer=MAINTAINER,
             maintainer_email=MAINTAINER_EMAIL,

@@ -1,8 +1,11 @@
+#import sys, os
+#myPath = os.path.dirname(os.path.abspath(__file__))
+#sys.path.insert(0, myPath + '/../')
+
 import unittest
 
 import numpy as np
 from kmpy import ode_builder
-
 
 paths = ode_builder.set_paths()
 

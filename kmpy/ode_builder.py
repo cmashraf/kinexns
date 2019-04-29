@@ -1,6 +1,6 @@
 import os
-#import numpy as np
-#from constants import GAS_CONST, MW
+import numpy as np
+from constants import GAS_CONST
 
 
 def set_paths():
@@ -43,8 +43,18 @@ class Reaction(object):
         
    
     def getReactantsName(self, line):
-        
-        #getting the reactants for each reaction
+        """getting the reactants for each reaction
+        Parameters
+        ____________
+        line        : str
+                    line from the files
+        Returs
+        ____________
+        reactants_names:    list
+                            A list with reactant names and their 
+                            stoichiometric ratios in the reaction
+        """
+       
         for spec in line.split(','):
             if float(spec.split('_')[0].split()[0]) < 0:
                 self.reactants_names.append((spec.split('_')[0].split()[0],
@@ -52,9 +62,19 @@ class Reaction(object):
             #print(self.species_names)
         return self.reactants_names
     
-    def getProductsName(self, line):
+    def getProductsName(self, line):        
+        """getting the products for each reaction
+        Parameters
+        ____________
+        line        : str
+                    line from the files
+        Returs
+        ____________
+        reactants_names:    list
+                            A list with product names and their 
+                            stoichiometric ratios in the reaction
+        """
         
-        #getting the reactants for each reaction
         for spec in line.split(','):
             if float(spec.split('_')[0].split()[0]) > 0:
                 self.products_names.append((spec.split('_')[0].split()[0],
@@ -63,8 +83,20 @@ class Reaction(object):
         return self.products_names
     
     def uniqueSpeciesName(self, line, species_list):
-        
-        #building the unique species list
+        """building the unique species list
+        Parameters
+        ____________
+        line        : str
+                    line from the files
+        species_list :     list
+                            A list of species already in the mechanism
+        Returs
+        ____________
+        reactants_names:    list
+                            A list with reactant names and their 
+                            stoichiometric ratios in the reaction
+        """
+
         #self.uniqueSpeciesList = species_list
         for spec in line.split(','):
             #self.uniqueSpeciesList = species_list
@@ -117,3 +149,67 @@ def build_species_list(reaction_file):
     species_list.sort()
 
     return reactant_list, product_list, species_list
+
+
+
+class Kinetic_params(object):
+    """
+    This is the kinetic params class, they read the rates constant file,
+    and generate the rate constants from the Arrhenius equations
+    """  
+
+    def __init__(self):
+        self.forward_rate_params = []
+        self.forward_rates = []
+        #self.forward_E = []
+        #self.uniqueSpeciesList = []
+        #species_names = []
+    
+    def getForwardRateParameters(self, line):
+        """
+        Reading the parameter file and parsing the useful infos
+        Parameters
+        ____________
+        line        : str
+                    line from the files
+        Returns
+        ____________
+        forward_rate_parms  :    list
+                            A list of Arrhenius paramters for the
+                            forward reaction 
+        
+        """    
+
+        self.forward_rate_params = [line.split(' ')[0], line.split(' ')[1],
+                      line.split(' ')[2].split()[0]]
+      
+        return self.forward_rate_params
+    
+    def getForwardRateConstant(self, parameters, T):
+        """
+        Generating the forward rate constants for each reaction
+        Parameters
+        ____________
+        parameters          : list
+                            A list of Arrhenius paramters
+        T                   : float, temperature
+        Returns
+        ____________
+        forward_rate_parms  :    list
+                            A list of forward rate constants (k_matrix)
+        """
+        
+
+        self.forward_rates = eval(parameters[0]) * np.exp(- eval(parameters[2])/
+                                                               (GAS_CONST * T))
+        return self.forward_rates
+
+def build_kmatrix_forward(rateconstantlist, temp):
+    
+    rate_constants = []
+    for line in open(rateconstantlist, 'r').readlines():
+        f_params = Kinetic_params()
+        params = f_params.getForwardRateParameters(line)
+        rate_constants.append(f_params.getForwardRateConstant(params, temp))
+    
+    return rate_constants

@@ -13,6 +13,8 @@ import sys
 import numpy as np
 #import cPickle as pickle
 
+cwd = os.getcwd()
+sys.path.insert(0, cwd)
 #from equivalent_compositions import write_compositionlist
 #import ligpy_utils as utils
 #import ddasac_utils as ddasac
@@ -31,7 +33,25 @@ if not os.path.exists(working_directory):
 
 
 #builiding the reactant, product and unique species list
-reactant_list, product_list, unique_species = \
+reactants_list, products_list, unique_species = \
 ode_builder.build_species_list(file_reactionlist)
 
-print(unique_species)
+#Making a complete reaction list with reactants and products
+#with their stoichiometric ratios
+reac_prod_list = [react + prod for react, prod in \
+zip(reactants_list, products_list)]
+
+#generating a dictionary of unique species from the species_list
+#where the species are keys and the indexes are values
+species_indices = {unique_species[i]:i for i in range(0, len(unique_species))}
+
+#reversing the species_indices matrix, indexes are the keys now
+indices_to_species = dict(zip(species_indices.values(), species_indices.keys()))
+
+#building forward rate constants
+temperature = 298
+
+forward_rate_constants = ode_builder.build_kmatrix_forward(file_rateconstantlist, temperature)
+
+
+print(forward_rate_constants)

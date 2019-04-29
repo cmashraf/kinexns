@@ -6,6 +6,7 @@ import unittest
 
 import numpy as np
 from kmpy import ode_builder
+from ..constants import GAS_CONST
 
 paths = ode_builder.set_paths()
 

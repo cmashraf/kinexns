@@ -1,6 +1,5 @@
 import os
 import numpy as np
-myPath = os.path.dirname(os.path.abspath(__file__))
 from .constants import GAS_CONST
 
 
@@ -20,6 +19,7 @@ def set_paths():
     """
     
     #module_dir = os.getcwd().split('ligpy_utils')[0]
+    myPath = os.path.dirname(os.path.abspath(__file__))
     reactionlist_path = myPath + '/data/complete_reaction_list.dat'
     rateconstantlist_path = myPath + '/data/complete_rateconstant_list.dat'
     compositionlist_path = myPath + '/data/compositionlist.dat'
@@ -205,6 +205,7 @@ class Kinetic_params(object):
                                                                (GAS_CONST * T))
         return self.forward_rates
 
+
 def build_kmatrix_forward(rateconstantlist, temp):
     
     rate_constants = []
@@ -214,3 +215,174 @@ def build_kmatrix_forward(rateconstantlist, temp):
         rate_constants.append(f_params.getForwardRateConstant(params, temp))
     
     return rate_constants
+
+
+def build_reac_prod_dict(reac_list, prod_list, speciesindices):
+    """
+    Build a dictionary of the reactants involved in each reaction,
+    along with their stoichiometric coefficients.  The keys of the
+    dictionary are the reaction numbers, the values are lists of lists
+    [[reactant1index, -1*coeff1],...]
+    Parameters
+    ----------
+    completereactionlist : str
+                           path to the file `complete_reaction_list.dat`
+    speciesindices       : dict
+                           the dictionary speciesindices from
+                           get_speciesindices()
+    Returns
+    -------
+    reactant_dict : dict
+                    a dictionary where keys are reaction numbers and values
+                    are lists of lists with the reactant species id and their
+                    stoichiometric coefficients for each reaction
+    product_dict : dict
+                    a dictionary where keys are reaction numbers and values
+                    are lists of lists with the product species id and their
+                    stoichiometric coefficients for each reaction
+    """
+    reactant_dict = {}
+    for rxnindex, reaction in enumerate(reac_list):
+        reactants = []
+        #
+        for x in range(len(reaction)):
+            # if the species is a reactant
+         #   if float(x.split('_')[0]) < 0:
+            reactants.append([speciesindices[reaction[x][1]],
+                                -1*float(reaction[x][0])])
+            #    in preceding line: *-1 because I want the |stoich coeff|
+        reactant_dict[rxnindex] = reactants
+        
+    products_dict = {}
+    for rxnindex, reaction in enumerate(prod_list):
+        products = []
+        #
+        for x in range(len(reaction)):
+            # if the species is a reactant
+         #   if float(x.split('_')[0]) < 0:
+            products.append([speciesindices[reaction[x][1]],
+                                1*float(reaction[x][0])])
+            #    in preceding line: *-1 because I want the |stoich coeff|
+        products_dict[rxnindex] = products
+    return reactant_dict, products_dict
+
+
+def build_reac_species_dict(reacprodlist, specieslist):
+    """
+    Build a dictionary where keys are species and values are lists with the
+    reactions that species is involved in, that reaction's sign in the net
+    rate equation, and the stoichiometric coefficient of the species in that
+    reaction.
+    Parameters
+    ----------
+    reacprodlist : list
+                        a list of both reactants and products and their 
+                        stoichiometric co-effs
+    specieslist  : list
+                        a list of unique species in the mecahnism
+    
+    Returns
+    -------
+    reac_species : dict
+                   keys are the species in the model; values are lists of
+                   [reaction that species is involved in,
+                   sign of that species in the net rate equation,
+                   sign for forward reaction ('-1', if reactant, '+1', if product),
+                   sign for backward reaction ('+1', if reactant, '-1', if product)]
+    """
+    #specieslist = get_specieslist(set_paths()[0])
+    reac_species = {}
+    for species in specieslist:
+        # This loop makes a list of which reactions "species" takes part in
+        # and what sign that term in the net rate eqn has
+        # and what the stoichiometric coefficient is
+    
+        reactions_involved = []
+        for rxnindex, reac_list in enumerate (reacprodlist):
+            for x in range(len(reac_list)):
+                # If the species being iterated over is part of this reaction
+                if species == reac_list[x][1]:
+                    # if the species is a reactant
+                    if float(reac_list[x][0]) < 0:
+                        reactions_involved.append(
+                            [rxnindex, -1, str(-1), '+'+str(1)])
+                    
+                    # if the species is a product
+                    if float(reac_list[x][0]) > 0:
+                        reactions_involved.append(
+                            [rxnindex, 1, '+'+str(1), str(-1)])
+    
+        reac_species[species] = reactions_involved
+    return reac_species
+
+
+def build_rates_list(reactant_dict, product_dict,
+                     indices_to_species, forward_rate_constants, human='no'):
+    """ This function writes the list of rate expressions for each reaction.
+    Parameters
+    ----------
+    rateconstlist      : str
+                         the path to the file `complete_rateconstant_list.dat`
+    reactionlist       : str
+                         the path to the file `complete_reaction_list.dat`
+    speciesindices     : dict
+                         a dictionary of arbitrary indices with the species
+                         from specieslist as keys
+    indices_to_species : dict
+                         the reverse of speciesindices (keys are the indices
+                         and values are the species)
+    human              : str, optional
+                         indicate whether the output of this function should
+                         be formatted for a human to read ('yes'). Default
+                         is 'no'
+    Returns
+    -------
+    rates_list : list
+                 a list of the rate expressions for all the reactions in the
+                 model
+    """
+    kmatrix = forward_rate_constants
+    rates_list_forward = []
+    for i, line in enumerate(kmatrix):
+        rate_reactant = 'rate_f[%s] = kf(T,%s) ' % (i, i)
+        concentrations = ''
+        for entry in reactant_dict[i]:
+            if entry == 'n':   # if there is no reaction
+                concentrations = '* 0'
+                break
+            else:
+                if human == 'no':
+                    concentrations += '* y[%s]**%s ' % (entry[0], entry[1])
+                elif human == 'yes':
+                    concentrations += '* [%s]**%s ' % \
+                        (indices_to_species[entry[0]], entry[1])
+                else:
+                    raise ValueError('human must be a string: yes or no')
+        rate_reactant += concentrations
+        rates_list_forward.append(rate_reactant)
+        
+    rates_list_reverse = []
+    for i, line in enumerate(kmatrix):
+        
+        rate_product = 'rate_r[%s] = kr(T,%s) ' % (i, i)
+        concentrations = ''
+        for entry in product_dict[i]:
+            if entry == 'n':   # if there is no reaction
+                concentrations = '* 0'
+                break
+            else:
+                if human == 'no':
+                    concentrations += '* y[%s]**%s ' % (entry[0], entry[1])
+                elif human == 'yes':
+                    concentrations += '* [%s]**%s ' % \
+                        (indices_to_species[entry[0]], entry[1])
+                else:
+                    raise ValueError('human must be a string: yes or no')
+        rate_product += concentrations
+        
+        #rate = rate_reactant + rate_product
+        rates_list_reverse.append(rate_product)
+    
+    #rates_list = [str(rates_list_forward[i]) +" - "+ str(rates_list_reverse[i]) 
+                  #for i in range(len(rates_list_forward))]
+    return rates_list_forward, rates_list_reverse

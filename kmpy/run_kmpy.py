@@ -48,12 +48,22 @@ species_indices = {unique_species[i]:i for i in range(0, len(unique_species))}
 #reversing the species_indices matrix, indexes are the keys now
 indices_to_species = dict(zip(species_indices.values(), species_indices.keys()))
 
+
+#build the reactants and products list for each reaction
+reac_dict, prod_dict = ode_builder.build_reac_prod_dict(reactants_list, products_list, species_indices)
+
+#build a dictionary where keys are the species and values are the reactions with 
+#stoichiometric ratios they are involvved in
+reac_species = ode_builder.build_reac_species_dict(reac_prod_list, unique_species)
+
 #building forward rate constants
 temperature = 298
 
 forward_rate_constants = ode_builder.build_kmatrix_forward(file_rateconstantlist, temperature)
 
-
-print(forward_rate_constants)
+#building the forward and reverse rate equations for each reaction
+rates_f, rates_r = ode_builder.build_rates_list( reac_dict, prod_dict,
+                     indices_to_species, forward_rate_constants,human='no')
+print(rates_f)
 
 

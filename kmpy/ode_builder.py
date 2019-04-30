@@ -1,5 +1,6 @@
 import os
 import numpy as np
+myPath = os.path.dirname(os.path.abspath(__file__))
 from .constants import GAS_CONST
 
 
@@ -18,10 +19,10 @@ def set_paths():
                             path to the file `compositionlist.dat`
     """
     
-    module_dir = os.getcwd().split('ligpy_utils')[0]
-    reactionlist_path = module_dir + '/data/complete_reaction_list.dat'
-    rateconstantlist_path = module_dir + '/data/complete_rateconstant_list.dat'
-    compositionlist_path = module_dir + '/data/compositionlist.dat'
+    #module_dir = os.getcwd().split('ligpy_utils')[0]
+    reactionlist_path = myPath + '/data/complete_reaction_list.dat'
+    rateconstantlist_path = myPath + '/data/complete_rateconstant_list.dat'
+    compositionlist_path = myPath + '/data/compositionlist.dat'
 
     return reactionlist_path, rateconstantlist_path, compositionlist_path
 

@@ -18,7 +18,7 @@ sys.path.insert(0, cwd)
 #from equivalent_compositions import write_compositionlist
 #import ligpy_utils as utils
 #import ddasac_utils as ddasac
-import .ode_builder
+from . import ode_builder
 
 # Time the duration of running this script
 #script_start_time = time.time()
@@ -55,3 +55,5 @@ forward_rate_constants = ode_builder.build_kmatrix_forward(file_rateconstantlist
 
 
 print(forward_rate_constants)
+
+

@@ -1,8 +1,10 @@
-#import sys, os
-#myPath = os.path.dirname(os.path.abspath(__file__))
+import sys, os
+myPath = os.path.dirname(os.path.abspath(__file__))
 #sys.path.insert(0, myPath + '/../')
 
 import unittest
+#import sys
+#sys.path.append('../kmpy')
 
 import numpy as np
 from ..ode_builder import set_paths

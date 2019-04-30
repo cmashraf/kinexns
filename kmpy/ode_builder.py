@@ -316,73 +316,88 @@ def build_reac_species_dict(reacprodlist, specieslist):
     return reac_species
 
 
+def build_rate_eqn(k_mat, r_dict, human, forward):
+    
+    """ This function writes the list of rate expressions for each reaction.
+    Parameters
+    ----------
+    kmat               : list
+                         A list of reaction rate contstants (k_forward or k_reverse)
+    r_dict             : dictionary
+                         reactant or product directory
+    human              : str, optional
+                         indicate whether the output of this function should
+                         be formatted for a human to read ('yes'). Default
+                         is 'no'
+    forward             : str
+                        reaction type,if 'yes', it is forward reaction
+                        default is 'yes'
+    Returns
+    -------
+    rates_list : list
+                A list of the rate expressions for all the reactions in the mecahnism
+    """
+
+    rates_list = []
+    for i, line in enumerate(k_mat):
+        if forward == 'yes':
+            rate = 'rate_f[%s] = kf(T,%s) ' % (i, i)
+        else:
+            rate = 'rate_r[%s] = kf(T,%s) ' % (i, i)
+        concentrations = ''
+        for entry in r_dict[i]:
+            if entry == 'n':   # if there is no reaction
+                concentrations = '* 0'
+                break
+            else:
+                if human == 'no':
+                    concentrations += '* y[%s]**%s ' % (entry[0], entry[1])
+                elif human == 'yes':
+                    concentrations += '* [%s]**%s ' % \
+                        (indices_to_species[entry[0]], entry[1])
+                else:
+                    raise ValueError('human must be a string: yes or no')
+    
+        rate += concentrations
+        
+        #rate = rate_reactant + rate_product
+        rates_list.append(rate)
+        
+    return rates_list
+    
+
+
 def build_rates_list(reactant_dict, product_dict,
                      indices_to_species, forward_rate_constants, human='no'):
     """ This function writes the list of rate expressions for each reaction.
     Parameters
     ----------
-    rateconstlist      : str
-                         the path to the file `complete_rateconstant_list.dat`
-    reactionlist       : str
-                         the path to the file `complete_reaction_list.dat`
-    speciesindices     : dict
-                         a dictionary of arbitrary indices with the species
-                         from specieslist as keys
+    reactant_dict      : dict
+                         A dictionary of reactants: key is the reaction number, 
+                         values are the list of list with reactant and stoic co-eff
+    product_dict      : dict
+                         A dictionary of productss: key is the reaction number, 
+                         values are the list of list with product and stoic co-eff
     indices_to_species : dict
                          the reverse of speciesindices (keys are the indices
                          and values are the species)
+    forward_rate_constants: list
+                            A list of forward rate constants for all the reactions
     human              : str, optional
                          indicate whether the output of this function should
                          be formatted for a human to read ('yes'). Default
                          is 'no'
     Returns
     -------
-    rates_list : list
-                 a list of the rate expressions for all the reactions in the
-                 model
+    rates_list_forward : list
+                        a list of the rate expressions for all the forward
+                        reactions in the model
+    rates_list_reverse : list
+                        a list of the rate expressions for all the reverse
+                        reactions in the model
     """
     kmatrix = forward_rate_constants
-    rates_list_forward = []
-    for i, line in enumerate(kmatrix):
-        rate_reactant = 'rate_f[%s] = kf(T,%s) ' % (i, i)
-        concentrations = ''
-        for entry in reactant_dict[i]:
-            if entry == 'n':   # if there is no reaction
-                concentrations = '* 0'
-                break
-            else:
-                if human == 'no':
-                    concentrations += '* y[%s]**%s ' % (entry[0], entry[1])
-                elif human == 'yes':
-                    concentrations += '* [%s]**%s ' % \
-                        (indices_to_species[entry[0]], entry[1])
-                else:
-                    raise ValueError('human must be a string: yes or no')
-        rate_reactant += concentrations
-        rates_list_forward.append(rate_reactant)
-        
-    rates_list_reverse = []
-    for i, line in enumerate(kmatrix):
-        
-        rate_product = 'rate_r[%s] = kr(T,%s) ' % (i, i)
-        concentrations = ''
-        for entry in product_dict[i]:
-            if entry == 'n':   # if there is no reaction
-                concentrations = '* 0'
-                break
-            else:
-                if human == 'no':
-                    concentrations += '* y[%s]**%s ' % (entry[0], entry[1])
-                elif human == 'yes':
-                    concentrations += '* [%s]**%s ' % \
-                        (indices_to_species[entry[0]], entry[1])
-                else:
-                    raise ValueError('human must be a string: yes or no')
-        rate_product += concentrations
-        
-        #rate = rate_reactant + rate_product
-        rates_list_reverse.append(rate_product)
+    rates_list_forward = build_rate_eqn(kmatrix, reactant_dict, human, forward = 'yes')
+    rates_list_reverse = build_rate_eqn(kmatrix, product_dict, human, forward = 'no')
     
-    #rates_list = [str(rates_list_forward[i]) +" - "+ str(rates_list_reverse[i]) 
-                  #for i in range(len(rates_list_forward))]
     return rates_list_forward, rates_list_reverse

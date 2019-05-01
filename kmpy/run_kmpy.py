@@ -62,8 +62,8 @@ temperature = 298
 forward_rate_constants = ode_builder.build_kmatrix_forward(file_rateconstantlist, temperature)
 
 #building the forward and reverse rate equations for each reaction
-rates_f, rates_r = ode_builder.build_rates_list( reac_dict, prod_dict,
-                     indices_to_species, forward_rate_constants,human='no')
+rates_f = ode_builder.build_rate_eqn(forward_rate_constants, reac_dict, indices_to_species, human = 'no', forward = 'yes')
+rates_r = ode_builder.build_rate_eqn(forward_rate_constants, prod_dict, indices_to_species, human = 'no', forward = 'yes')
 
 dydt_list = ode_builder.build_dydt_list(rates_f, rates_r, unique_species, reac_species, human='no')
 print(dydt_list)

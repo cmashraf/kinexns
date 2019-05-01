@@ -370,44 +370,6 @@ def build_rate_eqn(k_mat, r_dict, s_indices, human, forward):
     
 
 
-def build_rates_list(reactant_dict, product_dict,
-                     indices_to_species, forward_rate_constants, human='no'):
-    """ This function writes the list of rate expressions for each reaction.
-    Parameters
-    ----------
-    reactant_dict      : dict
-                         A dictionary of reactants: key is the reaction number, 
-                         values are the list of list with reactant and stoic co-eff
-    product_dict      : dict
-                         A dictionary of productss: key is the reaction number, 
-                         values are the list of list with product and stoic co-eff
-    indices_to_species : dict
-                         the reverse of speciesindices (keys are the indices
-                         and values are the species)
-    forward_rate_constants: list
-                            A list of forward rate constants for all the reactions
-    human              : str, optional
-                         indicate whether the output of this function should
-                         be formatted for a human to read ('yes'). Default
-                         is 'no'
-    Returns
-    -------
-    rates_list_forward : list
-                        a list of the rate expressions for all the forward
-                        reactions in the model
-    rates_list_reverse : list
-                        a list of the rate expressions for all the reverse
-                        reactions in the model
-    """
-    kmatrix = forward_rate_constants
-    #forward reactions
-    rates_list_forward = build_rate_eqn(kmatrix, reactant_dict, indices_to_species, human, forward = 'yes')
-    #reverse reactions
-    rates_list_reverse = build_rate_eqn(kmatrix, product_dict, indices_to_species, human, forward = 'no')
-    
-    return rates_list_forward, rates_list_reverse
-
-
 def build_dydt_list(rates_forward, rates_reverse, specieslist, species_rxns, human='no'):
     """This function returns the list of dydt expressions generated for all
     the reactions from rates_list.

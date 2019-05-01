@@ -46,3 +46,13 @@ class TestGetSpecieslist(unittest.TestCase):
                                                              'string' %
                                                              specieslist[2][i])
             self.assertLess(len(specieslist[2][i]), 2)
+
+
+    def test_key_value_pairs_are_correct(self):
+        """Are the key value pairs in both dictionaries what we expect given
+        the original kinetic scheme from Hough et al, 2016?"""
+        specieslist = build_species_list(paths[0])
+        output = {specieslist[2][i]:i for i in range(0, len(specieslist[2]))}
+        self.assertEqual(output['B'], 1)
+        self.assertEqual(output['D'], 3)
+        self.assertEqual(output['F'], 5)

@@ -9,6 +9,7 @@ import unittest
 import numpy as np
 from ..ode_builder import set_paths, build_species_list
 from ..ode_builder import build_kmatrix_forward, build_reac_prod_dict
+from ..ode_builder import build_reac_species_dict
 from ..constants import GAS_CONST
 
 paths = set_paths(myPath)
@@ -103,3 +104,23 @@ class TestBuildReactantDict(unittest.TestCase):
         self.assertEqual(reactantdict[0][2], [[1, 1.0], [2, 1.0]])
         self.assertEqual(reactantdict[1][1], [[4, 1.0]])
         self.assertEqual(reactantdict[1][3], [[3, 1.0], [5, 1.0]])
+
+
+class TestBuildSpeciesRxnsDict(unittest.TestCase):
+    """Tests for build_species_rxns_dict()"""
+
+    def test_correct_num_keys(self):
+        """Does the returned reactant_dict have the correct number of keys?"""
+        specieslist = build_species_list(paths[0])
+        reac_prod_list = [react + prod for react, prod in zip(specieslist[0], specieslist[1])]
+        species_rxns = build_reac_species_dict(reac_prod_list, specieslist[2])
+        self.assertEqual(len(species_rxns), 6)
+
+    def test_returns_expected_values(self):
+        """Does the reactant_dict have the values we expect?"""
+        specieslist = build_species_list(paths[0])
+        reac_prod_list = [react + prod for react, prod in zip(specieslist[0], specieslist[1])]
+        species_rxns = build_reac_species_dict(reac_prod_list, specieslist[2])
+        self.assertEqual(species_rxns['B'], [[0, -1, '-1', '+1'], [2, -1, '-1', '+1']])
+        self.assertEqual(species_rxns['D'], [[0, 1, '+1', '-1'], [2, 1, '+1', '-1'], [3, 1, '+1', '-1']])
+        self.assertEqual(species_rxns['F'], [[3, 1, '+1', '-1']])

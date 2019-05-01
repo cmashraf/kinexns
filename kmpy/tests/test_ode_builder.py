@@ -8,7 +8,7 @@ import unittest
 
 import numpy as np
 from ..ode_builder import set_paths, build_species_list
-from ..ode_builder import build_kmatrix_forward
+from ..ode_builder import build_kmatrix_forward, build_reac_prod_dict
 from ..constants import GAS_CONST
 
 paths = set_paths(myPath)
@@ -83,3 +83,23 @@ class TestBuildKMatrix(unittest.TestCase):
         self.assertEqual(kmatrix[1], 1.526499549219028e-28)
         self.assertEqual(kmatrix[2], 7.640134676963482e-48)
         self.assertEqual(kmatrix[3], 3.399012999643825e-67)
+
+class TestBuildReactantDict(unittest.TestCase):
+    """Tests for build_reactant_dict"""
+
+    def test_correct_num_keys(self):
+        """Does the returned reactant_dict have the correct number of keys?"""
+        specieslist = build_species_list(paths[0])
+        output_dict = {specieslist[2][i]:i for i in range(0, len(specieslist[2]))}
+        reactantdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
+        self.assertEqual(len(reactantdict[0]), 4)
+
+    def test_returns_expected_values(self):
+        """Does the reactant_dict have the values we expect?"""
+        specieslist = build_species_list(paths[0])
+        output_dict = {specieslist[2][i]:i for i in range(0, len(specieslist[2]))}
+        reactantdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
+        self.assertEqual(reactantdict[0][1], [[0, 1.0]])
+        self.assertEqual(reactantdict[0][2], [[1, 1.0], [2, 1.0]])
+        self.assertEqual(reactantdict[1][1], [[4, 1.0]])
+        self.assertEqual(reactantdict[1][3], [[3, 1.0], [5, 1.0]])

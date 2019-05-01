@@ -25,8 +25,9 @@ from . import ode_builder
 #script_start_time_human = time.asctime()
 
 # These are the files and paths that will be referenced in this program:
+myPath = os.path.dirname(os.path.abspath(__file__))
 file_reactionlist, file_rateconstantlist, file_compositionlist\
-    = ode_builder.set_paths()
+    = ode_builder.set_paths(myPath)
 working_directory = 'results_dir'
 if not os.path.exists(working_directory):
     os.makedirs(working_directory)

@@ -7,10 +7,10 @@ import unittest
 #sys.path.append('../kmpy')
 
 import numpy as np
-from ..ode_builder import set_paths
+from ..ode_builder import set_paths, build_species_list
 from ..constants import GAS_CONST
 
-paths = set_paths()
+paths = set_paths(myPath)
 
 
 class TestSetPaths(unittest.TestCase):
@@ -28,3 +28,21 @@ class TestSetPaths(unittest.TestCase):
         self.assertEqual('compositionlist.dat', paths[2].split('/')[-1])
 
 
+class TestGetSpecieslist(unittest.TestCase):
+    """Tests for get_specieslist()"""
+
+    def test_correct_num_species(self):
+        """Does get_specieslist() return the correct number of species (with
+        'correct' being defined as the number of species in the model as
+        developed by Hough et al., 2016)"""
+        specieslist = build_species_list(paths[0])
+        self.assertEqual(6, len(specieslist[2]))
+
+    def test_correct_format(self):
+        """Are the entries in specieslist strings longer than 1 character?"""
+        specieslist = build_species_list(paths[0])
+        for i in np.random.randint(0, len(specieslist[2]), 5):
+            self.assertIsInstance(specieslist[2][i], str, msg='%s is not a '
+                                                             'string' %
+                                                             specieslist[2][i])
+            self.assertLess(len(specieslist[2][i]), 2)

@@ -3,7 +3,7 @@ import numpy as np
 from .constants import GAS_CONST
 
 
-def set_paths():
+def set_paths(myPath):
     
     """
     Set the absolute path to required files on the current machine.
@@ -19,7 +19,6 @@ def set_paths():
     """
     
     #module_dir = os.getcwd().split('ligpy_utils')[0]
-    myPath = os.path.dirname(os.path.abspath(__file__))
     reactionlist_path = myPath + '/data/complete_reaction_list.dat'
     rateconstantlist_path = myPath + '/data/complete_rateconstant_list.dat'
     compositionlist_path = myPath + '/data/compositionlist.dat'

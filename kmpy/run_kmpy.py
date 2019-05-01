@@ -64,6 +64,8 @@ forward_rate_constants = ode_builder.build_kmatrix_forward(file_rateconstantlist
 #building the forward and reverse rate equations for each reaction
 rates_f, rates_r = ode_builder.build_rates_list( reac_dict, prod_dict,
                      indices_to_species, forward_rate_constants,human='no')
-print(rates_f)
+
+dydt_list = ode_builder.build_dydt_list(rates_f, rates_r, unique_species, reac_species, human='no')
+print(dydt_list)
 
 

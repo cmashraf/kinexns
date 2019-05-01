@@ -346,7 +346,7 @@ def build_rate_eqn(k_mat, r_dict, s_indices, human, forward):
         if forward == 'yes':
             rate = 'rate_f[%s] = kf(T,%s) ' % (i, i)
         else:
-            rate = 'rate_r[%s] = kf(T,%s) ' % (i, i)
+            rate = 'rate_r[%s] = kr(T,%s) ' % (i, i)
         concentrations = ''
         for entry in r_dict[i]:
             if entry == 'n':   # if there is no reaction
@@ -400,7 +400,52 @@ def build_rates_list(reactant_dict, product_dict,
                         reactions in the model
     """
     kmatrix = forward_rate_constants
+    #forward reactions
     rates_list_forward = build_rate_eqn(kmatrix, reactant_dict, indices_to_species, human, forward = 'yes')
+    #reverse reactions
     rates_list_reverse = build_rate_eqn(kmatrix, product_dict, indices_to_species, human, forward = 'no')
     
     return rates_list_forward, rates_list_reverse
+
+
+def build_dydt_list(rates_forward, rates_reverse, specieslist, species_rxns, human='no'):
+    """This function returns the list of dydt expressions generated for all
+    the reactions from rates_list.
+    Parameters
+    ----------
+    rates_forward      : list
+                         the output of build_rates_list(), list of forward rates
+    rates_reverse      : list
+                         the output of build_rates_list(), list of reverse rates
+    specieslist        : list
+                         a list of all the species in the kinetic scheme
+    species_rxns       : dict
+                         dictionary where keys that are the model species and
+                         values are the reactions they are involved in
+    human              : str, optional
+                         indicate whether the output of this function should
+                         be formatted for a human to read ('yes'). Default
+                         is 'no'
+    Returns
+    -------
+    dydt_expressions : list
+                       expressions for the ODEs expressing the concentration
+                       of each species with time
+    """
+    dydt_expressions = []
+    for species in specieslist:
+        rate_formation = 'd[%s]/dt = ' % (species)
+        # "entry" is [reaction#, sign of that reaction, coefficient]
+        for entry in species_rxns[species]:
+            if human == 'no':
+                rate_formation += '%s*%s' % \
+                    (entry[2], rates_forward[entry[0]].split(' = ')[1])
+                rate_formation += '%s*%s' % \
+                    (entry[3], rates_reverse[entry[0]].split(' = ')[1])
+            elif human == 'yes':
+                rate_formation += '%s*rate_f[%s] ' % (entry[2], entry[0])
+                rate_formation += '%s*rate_r[%s] ' % (entry[3], entry[0])
+            else:
+                raise ValueError('human must be a string: yes or no')
+        dydt_expressions.append(rate_formation)
+    return dydt_expressions

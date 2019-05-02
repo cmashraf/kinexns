@@ -1,2 +1,2 @@
-from .version import __version__
+from .version import __version__  # noqa
 __all__ = ["ode_builder", "run_kmpy", "constants"]

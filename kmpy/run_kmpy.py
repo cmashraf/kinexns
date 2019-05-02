@@ -7,24 +7,24 @@ Please read the documentation for instructions on using this module.
 """
 
 import os
-import time
+# import time
 import sys
+from . import ode_builder
 
-import numpy as np
-#import cPickle as pickle
+# import numpy as np
+# import cPickle as pickle
 
 cwd = os.getcwd()
 sys.path.insert(0, cwd)
-#from equivalent_compositions import write_compositionlist
-#import ligpy_utils as utils
-#import ddasac_utils as ddasac
-from . import ode_builder
+# from equivalent_compositions import write_compositionlist
+# import ligpy_utils as utils
+# import ddasac_utils as ddasac
 
-# Time the duration of running this script
-#script_start_time = time.time()
-#script_start_time_human = time.asctime()
+#  Time the duration of running this script
+# script_start_time = time.time()
+# script_start_time_human = time.asctime()
 
-# These are the files and paths that will be referenced in this program:
+#  These are the files and paths that will be referenced in this program:
 myPath = os.path.dirname(os.path.abspath(__file__))
 file_reactionlist, file_rateconstantlist, file_compositionlist\
     = ode_builder.set_paths(myPath)
@@ -33,40 +33,52 @@ if not os.path.exists(working_directory):
     os.makedirs(working_directory)
 
 
-#builiding the reactant, product and unique species list
-reactants_list, products_list, unique_species = \
-ode_builder.build_species_list(file_reactionlist)
+# builiding the reactant, product and unique species list
+reactants_list, products_list, unique_species =\
+    ode_builder.build_species_list(file_reactionlist)
 
-#Making a complete reaction list with reactants and products
-#with their stoichiometric ratios
-reac_prod_list = [react + prod for react, prod in \
-zip(reactants_list, products_list)]
+# Making a complete reaction list with reactants and products
+# with their stoichiometric ratios
+reac_prod_list = [react + prod for react, prod in
+                  zip(reactants_list, products_list)]
 
-#generating a dictionary of unique species from the species_list
-#where the species are keys and the indexes are values
-species_indices = {unique_species[i]:i for i in range(0, len(unique_species))}
+# generating a dictionary of unique species from the species_list
+# where the species are keys and the indexes are values
+species_indices = {unique_species[i]: i for i in
+                   range(0, len(unique_species))}
 
-#reversing the species_indices matrix, indexes are the keys now
-indices_to_species = dict(zip(species_indices.values(), species_indices.keys()))
+# reversing the species_indices matrix, indexes are the keys now
+indices_to_species = dict(zip(species_indices.values(),
+                          species_indices.keys()))
 
 
-#build the reactants and products list for each reaction
-reac_dict, prod_dict = ode_builder.build_reac_prod_dict(reactants_list, products_list, species_indices)
+# build the reactants and products list for each reaction
+reac_dict, prod_dict =\
+    ode_builder.build_reac_prod_dict(reactants_list,
+                                     products_list, species_indices)
 
-#build a dictionary where keys are the species and values are the reactions with 
-#stoichiometric ratios they are involvved in
-reac_species = ode_builder.build_reac_species_dict(reac_prod_list, unique_species)
+# build a dictionary where keys are the species
+# and values are the reactions with
+# stoichiometric ratios they are involvved in
+reac_species =\
+    ode_builder.build_reac_species_dict(reac_prod_list,
+                                        unique_species)
 
-#building forward rate constants
+# building forward rate constants
 temperature = 298
 
-forward_rate_constants = ode_builder.build_kmatrix_forward(file_rateconstantlist, temperature)
+forward_rate_constants =\
+    ode_builder.build_kmatrix_forward(file_rateconstantlist,
+                                      temperature)
 print(forward_rate_constants)
-#building the forward and reverse rate equations for each reaction
-rates_f = ode_builder.build_rate_eqn(forward_rate_constants, reac_dict, indices_to_species, human = 'no', forward = 'yes')
-rates_r = ode_builder.build_rate_eqn(forward_rate_constants, prod_dict, indices_to_species, human = 'no', forward = 'yes')
+# building the forward and reverse rate equations for each reaction
+rates_f = ode_builder.build_rate_eqn(forward_rate_constants,
+                                     reac_dict, indices_to_species,
+                                     human='no', forward='yes')
+rates_r = ode_builder.build_rate_eqn(forward_rate_constants,
+                                     prod_dict, indices_to_species,
+                                     human='no', forward='yes')
 
-dydt_list = ode_builder.build_dydt_list(rates_f, rates_r, unique_species, reac_species, human='no')
-#print(dydt_list)
-
-
+dydt_list = ode_builder.build_dydt_list(rates_f, rates_r, unique_species,
+                                        reac_species, human='no')
+# print(dydt_list)

@@ -33,11 +33,12 @@ class Reaction(object):
 
     def __init__(self):
 
-        # initiating the class
+        #   initiating the class
         self.reactants_names = []
         self.products_names = []
         self.uniqueSpeciesList = []
-        # species_names = []
+        #   species_names = []
+
 
     def getReactantsName(self, line):
         """getting the reactants for each reaction
@@ -55,8 +56,8 @@ class Reaction(object):
         for spec in line.split(','):
             if float(spec.split('_')[0].split()[0]) < 0:
                 self.reactants_names.append((spec.split('_')[0].split()[0],
-                                             spec.split('_')[1].split()[0]))
-            # print(self.species_names)
+                                          spec.split('_')[1].split()[0]))
+            #  print(self.species_names)
         return self.reactants_names
 
     def getProductsName(self, line):
@@ -75,8 +76,8 @@ class Reaction(object):
         for spec in line.split(','):
             if float(spec.split('_')[0].split()[0]) > 0:
                 self.products_names.append((spec.split('_')[0].split()[0],
-                                            spec.split('_')[1].split()[0]))
-            # print(self.species_names)
+                                          spec.split('_')[1].split()[0]))
+            #  print(self.species_names)
         return self.products_names
 
     def uniqueSpeciesName(self, line, species_list):
@@ -94,18 +95,18 @@ class Reaction(object):
                             stoichiometric ratios in the reaction
         """
 
-        # self.uniqueSpeciesList = species_list
+        #  self.uniqueSpeciesList = species_list
         for spec in line.split(','):
-            # self.uniqueSpeciesList = species_list
-            #  If the species has already been added to the list then move on.
+            #  self.uniqueSpeciesList = species_list
+            #   If the species has already been added to the list then move on.
             if spec.split('_')[1].split()[0] in species_list:
                 self.uniqueSpeciesList = species_list
                 continue
             else:
-                # print(self.uniqueSpeciesList)
+                #  print(self.uniqueSpeciesList)
                 self.uniqueSpeciesList = species_list
                 self.uniqueSpeciesList.append(spec.split('_')[1].split()[0])
-            # print(spec.split('_')[1].split()[0])
+            #  print(spec.split('_')[1].split()[0])
         return self.uniqueSpeciesList
 
 
@@ -130,7 +131,7 @@ def build_species_list(reaction_file):
                         a list of unique species in the mechanism
     """
 
-    # initializing reactant, product and unique species list
+    #  initializing reactant, product and unique species list
     reactant_list = []
     product_list = []
     species_name = []
@@ -140,12 +141,13 @@ def build_species_list(reaction_file):
         reactant_list.append(reac.getReactantsName(line))
         product_list.append(reac.getProductsName(line))
         current_species = species_name
-        # print(current_species)
+        #  print(current_species)
         species_list = reac.uniqueSpeciesName(line, current_species)
-        # print(species_name)
+        #  print(species_name)
     species_list.sort()
 
     return reactant_list, product_list, species_list
+
 
 
 class Kinetic_params(object):
@@ -157,9 +159,9 @@ class Kinetic_params(object):
     def __init__(self):
         self.forward_rate_params = []
         self.forward_rates = []
-        # self.forward_E = []
-        # self.uniqueSpeciesList = []
-        # species_names = []
+        #  self.forward_E = []
+        #  self.uniqueSpeciesList = []
+        #  species_names = []
 
     def getForwardRateParameters(self, line):
         """
@@ -177,7 +179,7 @@ class Kinetic_params(object):
         """
 
         self.forward_rate_params = [line.split(' ')[0], line.split(' ')[1],
-                                    line.split(' ')[2].split()[0]]
+                      line.split(' ')[2].split()[0]]
 
         return self.forward_rate_params
 
@@ -195,8 +197,9 @@ class Kinetic_params(object):
                             A list of forward rate constants (k_matrix)
         """
 
-        self.forward_rates = (eval(parameters[0]) *
-                              np.exp(- eval(parameters[2])/(GAS_CONST * T)))
+
+        self.forward_rates = eval(parameters[0]) * np.exp(- eval(parameters[2])/
+                                                               (GAS_CONST * T))
         return self.forward_rates
 
 
@@ -238,25 +241,25 @@ def build_reac_prod_dict(reac_list, prod_list, speciesindices):
     reactant_dict = {}
     for rxnindex, reaction in enumerate(reac_list):
         reactants = []
-
+        #  
         for x in range(len(reaction)):
-            # if the species is a reactant
-            # if float(x.split('_')[0]) < 0:
+            #   if the species is a reactant
+         #     if float(x.split('_')[0]) < 0:
             reactants.append([speciesindices[reaction[x][1]],
-                             -1*float(reaction[x][0])])
-            # in preceding line: *-1 because I want the |stoich coeff|
+                                -1*float(reaction[x][0])])
+            #      in preceding line: *-1 because I want the |stoich coeff|
         reactant_dict[rxnindex] = reactants
 
     products_dict = {}
     for rxnindex, reaction in enumerate(prod_list):
         products = []
-
+        #  
         for x in range(len(reaction)):
-            # if the species is a reactant
-            # if float(x.split('_')[0]) < 0:
+            #   if the species is a reactant
+         #     if float(x.split('_')[0]) < 0:
             products.append([speciesindices[reaction[x][1]],
-                            1*float(reaction[x][0])])
-            # in preceding line: *-1 because I want the |stoich coeff|
+                                1*float(reaction[x][0])])
+            #      in preceding line: *-1 because I want the |stoich coeff|
         products_dict[rxnindex] = products
     return reactant_dict, products_dict
 
@@ -281,32 +284,30 @@ def build_reac_species_dict(reacprodlist, specieslist):
                    keys are the species in the model; values are lists of
                    [reaction that species is involved in,
                    sign of that species in the net rate equation,
-                   sign for forward reaction ('-1', if reactant,
-                   '+1', if product),
-                   sign for backward reaction ('+1', if reactant,
-                   '-1', if product)]
+                   sign for forward reaction ('-1', if reactant, '+1', if product),
+                   sign for backward reaction ('+1', if reactant, '-1', if product)]
     """
-    # specieslist = get_specieslist(set_paths()[0])
+    #  specieslist = get_specieslist(set_paths()[0])
     reac_species = {}
     for species in specieslist:
-        # This loop makes a list of which reactions "species" takes part in
-        # and what sign that term in the net rate eqn has
-        # and what the stoichiometric coefficient is
+        #   This loop makes a list of which reactions "species" takes part in
+        #   and what sign that term in the net rate eqn has
+        #   and what the stoichiometric coefficient is
 
         reactions_involved = []
-        for rxnindex, reac_list in enumerate(reacprodlist):
+        for rxnindex, reac_list in enumerate (reacprodlist):
             for x in range(len(reac_list)):
-                # If the species being iterated over is part of this reaction
+                #   If the species being iterated over is part of this reaction
                 if species == reac_list[x][1]:
-                    # if the species is a reactant
+                    #   if the species is a reactant
                     if float(reac_list[x][0]) < 0:
-                        reactions_involved.append([rxnindex, -1, str(-1),
-                                                  '+'+str(1)])
+                        reactions_involved.append(
+                            [rxnindex, -1, str(-1), '+'+str(1)])
 
-                    # if the species is a product
+                    #   if the species is a product
                     if float(reac_list[x][0]) > 0:
-                        reactions_involved.append([rxnindex, 1, '+'+str(1),
-                                                  str(-1)])
+                        reactions_involved.append(
+                            [rxnindex, 1, '+'+str(1), str(-1)])
 
         reac_species[species] = reactions_involved
     return reac_species
@@ -318,8 +319,7 @@ def build_rate_eqn(k_mat, r_dict, s_indices, human, forward):
     Parameters
     ----------
     kmat               : list
-                         A list of reaction rate contstants
-                         (k_forward or k_reverse)
+                         A list of reaction rate contstants (k_forward or k_reverse)
     r_dict             : dictionary
                          reactant or product directory
     s_indices          : dict
@@ -335,8 +335,7 @@ def build_rate_eqn(k_mat, r_dict, s_indices, human, forward):
     Returns
     -------
     rates_list : list
-                A list of the rate expressions for all the
-                reactions in the mecahnism
+                A list of the rate expressions for all the reactions in the mecahnism
     """
 
     rates_list = []
@@ -347,7 +346,7 @@ def build_rate_eqn(k_mat, r_dict, s_indices, human, forward):
             rate = 'rate_r[%s] = kr(T,%s) ' % (i, i)
         concentrations = ''
         for entry in r_dict[i]:
-            if entry == 'n':
+            if entry == 'n':   #   if there is no reaction
                 concentrations = '* 0'
                 break
             else:
@@ -361,24 +360,22 @@ def build_rate_eqn(k_mat, r_dict, s_indices, human, forward):
 
         rate += concentrations
 
-        # rate = rate_reactant + rate_product
+        #  rate = rate_reactant + rate_product
         rates_list.append(rate)
 
     return rates_list
 
 
-def build_dydt_list(rates_forward, rates_reverse, specieslist,
-                    species_rxns, human='no'):
+
+def build_dydt_list(rates_forward, rates_reverse, specieslist, species_rxns, human='no'):
     """This function returns the list of dydt expressions generated for all
     the reactions from rates_list.
     Parameters
     ----------
     rates_forward      : list
-                         the output of build_rates_list(),
-                         list of forward rates
+                         the output of build_rates_list(), list of forward rates
     rates_reverse      : list
-                         the output of build_rates_list(),
-                         list of reverse rates
+                         the output of build_rates_list(), list of reverse rates
     specieslist        : list
                          a list of all the species in the kinetic scheme
     species_rxns       : dict
@@ -397,7 +394,7 @@ def build_dydt_list(rates_forward, rates_reverse, specieslist,
     dydt_expressions = []
     for species in specieslist:
         rate_formation = 'd[%s]/dt = ' % (species)
-        #  "entry" is [reaction# , sign of that reaction, coefficient]
+        #   "entry" is [reaction#  , sign of that reaction, coefficient]
         for entry in species_rxns[species]:
             if human == 'no':
                 rate_formation += '%s*%s' % \

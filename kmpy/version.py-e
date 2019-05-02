@@ -1,14 +1,14 @@
 from __future__ import absolute_import, division, print_function
 from os.path import join as pjoin
 
-#  Format expected by setup.py and doc/source/conf.py: string of form "X.Y.Z"
+# Format expected by setup.py and doc/source/conf.py: string of form "X.Y.Z"
 _version_major = 0
 _version_minor = 1
-_version_micro = ''
+_version_micro = ''  # use '' for first of series, number for 1 and above
 _version_extra = 'dev'
-#  _version_extra = ''  #  Uncomment this for full releases
+# _version_extra = ''  # Uncomment this for full releases
 
-#  Construct full version string from these.
+# Construct full version string from these.
 _ver = [_version_major, _version_minor]
 if _version_micro:
     _ver.append(_version_micro)
@@ -25,15 +25,14 @@ CLASSIFIERS = ["Development Status :: 3 - Alpha",
                "Programming Language :: Python",
                "Topic :: Scientific/Engineering"]
 
-#  Description should be a one-liner:
+# Description should be a one-liner:
 description = "shablona: a template for small scientific Python projects"
-#  Long description will go up on the pypi page
+# Long description will go up on the pypi page
 long_description = """
 
 kmpy
 ========
-kmpy is a tool to build kinetic models with given reaction mechanism
-and optimize the model parameters by solving ODEs.
+kmpy is a tool to build kinetic models with given reaction mechanism and optimize the model parameters by solving ODEs.
 
 It contains software implementations of an analysis of some simple data, but
 more importantly, it contains infrastructure for testing, documentation,

@@ -3,15 +3,15 @@ Named constants, or objects with values that are constant, used by other
 modules.
 """
 
-#  Universal gas constant [J mol^-1 K^-1]
+# Universal gas constant [J mol^-1 K^-1]
 GAS_CONST = 8.314
-#  The cooling rate in *C/min to use if a cool down period is specified
+# The cooling rate in *C/min to use if a cool down period is specified
 COOL_RATE = -13
-#  Tolerances for ODE solver
+# Tolerances for ODE solver
 ABSOLUTE_TOLERANCE = 1E-11
 RELATIVE_TOLERANCE = 1E-9
 
-#  MW Dictionary values are:
+# MW Dictionary values are:
 # [0] MW
 # [1] phase (g,s,lt,t,char,H20,CO,CO2)
 # The rest of the columns are information that is only needed for tar
@@ -22,10 +22,8 @@ RELATIVE_TOLERANCE = 1E-9
 # [carbonyl, aromatic C-O, aromatic C-C, aromatic C-H, aliphatic C-O,
 # Methoxyl-aromatic, aliphatic C-C]
 # .
-# You can make changes to this dictionary to
-# adjust which fraction each species
-# is attributed to when lumping
-# (commonly changed might be methanol, ETOH,
+# You can make changes to this dictionary to adjust which fraction each species
+# is attributed to when lumping (commonly changed might be methanol, ETOH,
 # ALD3, so those are located at the top).
 # .
 # The phenolic family entry indicates whether a tar species belongs to the

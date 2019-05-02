@@ -9,7 +9,8 @@ import unittest
 import numpy as np
 from ..ode_builder import set_paths, build_species_list
 from ..ode_builder import build_kmatrix_forward, build_reac_prod_dict
-from ..ode_builder import build_reac_species_dict
+from ..ode_builder import build_reac_species_dict, build_rate_eqn
+from ..ode_builder import build_dydt_list
 from ..constants import GAS_CONST
 
 paths = set_paths(myPath)
@@ -124,3 +125,61 @@ class TestBuildSpeciesRxnsDict(unittest.TestCase):
         self.assertEqual(species_rxns['B'], [[0, -1, '-1', '+1'], [2, -1, '-1', '+1']])
         self.assertEqual(species_rxns['D'], [[0, 1, '+1', '-1'], [2, 1, '+1', '-1'], [3, 1, '+1', '-1']])
         self.assertEqual(species_rxns['F'], [[3, 1, '+1', '-1']])
+
+
+class TestBuildRatesEqn(unittest.TestCase):
+    """Tests for build_rates_list()"""
+
+    
+    def test_correct_length(self):
+        """Are the correct number of entries present in the rates_list?"""
+        specieslist = build_species_list(paths[0])
+        kmatrix = build_kmatrix_forward(paths[1], 298)
+        output_dict = {specieslist[2][i]:i for i in range(0, len(specieslist[2]))}
+        output_dict_rev = dict(zip(output_dict.values(), output_dict.keys()))
+        reacdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
+        rates_list = build_rate_eqn(kmatrix, reacdict[0], output_dict_rev, human = 'no', forward = 'yes')
+        self.assertEqual(len(rates_list), 4)
+
+    def test_returns_expected_values(self):
+        """Are the expected rate expressions returned?"""
+        kmatrix = build_kmatrix_forward(paths[1], 298)
+        specieslist = build_species_list(paths[0])
+        output_dict = {specieslist[2][i]:i for i in range(0, len(specieslist[2]))}
+        output_dict_rev = dict(zip(output_dict.values(), output_dict.keys()))
+        reacdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
+        rates_list_f = build_rate_eqn(kmatrix, reacdict[0], output_dict_rev, human = 'no', forward = 'yes')
+        rates_list_r = build_rate_eqn(kmatrix, reacdict[1], output_dict_rev, human = 'no', forward = 'no')
+        self.assertEqual(rates_list_f[0], 'rate_f[0] = kf(T,0) * y[0]**1.0 * y[1]**2.0 ')
+        self.assertEqual(rates_list_r[0], 'rate_r[0] = kr(T,0) * y[2]**1.0 * y[3]**1.0 ')
+
+
+class TestBuildDYDTList(unittest.TestCase):
+    """Tests for build_dydt_list()"""
+
+    def test_correct_length(self):
+        """Are the correct number of ODEs present in the dydt list?"""
+        specieslist = build_species_list(paths[0])
+        reac_prod_list = [react + prod for react, prod in zip(specieslist[0], specieslist[1])]
+        output_dict = {build_species_list(paths[0])[2][i]:i for i in range(0, len(build_species_list(paths[0])[2]))}
+        species_rxns = build_reac_species_dict(reac_prod_list, specieslist[2])
+        reacdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
+        kmatrix = build_kmatrix_forward(paths[1], 298)
+        output_dict_rev = dict(zip(output_dict.values(), output_dict.keys()))
+        rates_f = build_rate_eqn(kmatrix, reacdict[0], output_dict_rev, human = 'no', forward = 'yes')
+        rates_r = build_rate_eqn(kmatrix, reacdict[1], output_dict_rev, human = 'no', forward = 'no')
+        dydt = build_dydt_list(rates_f, rates_r, specieslist[2], species_rxns, human='no')    
+        self.assertEqual(len(dydt), 6)
+
+    def test_returns_expected_values(self):
+        specieslist = build_species_list(paths[0])
+        reac_prod_list = [react + prod for react, prod in zip(specieslist[0], specieslist[1])]
+        output_dict = {build_species_list(paths[0])[2][i]:i for i in range(0, len(build_species_list(paths[0])[2]))}
+        species_rxns = build_reac_species_dict(reac_prod_list, specieslist[2])
+        reacdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
+        kmatrix = build_kmatrix_forward(paths[1], 298)
+        output_dict_rev = dict(zip(output_dict.values(), output_dict.keys()))
+        rates_f = build_rate_eqn(kmatrix, reacdict[0], output_dict_rev, human = 'no', forward = 'yes')
+        rates_r = build_rate_eqn(kmatrix, reacdict[1], output_dict_rev, human = 'no', forward = 'no')
+        dydt = build_dydt_list(rates_f, rates_r, specieslist[2], species_rxns, human='no')    
+        self.assertEqual(dydt[5], 'd[F]/dt = +1*kf(T,3) * y[0]**1.0 -1*kr(T,3) * y[3]**1.0 * y[5]**1.0 ')

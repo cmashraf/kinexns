@@ -1,7 +1,0 @@
-[run]
-branch = True
-source = kmpy/*
-include = kmpy/*
-omit = */setup.py
-[report]
-include = kmpy/*

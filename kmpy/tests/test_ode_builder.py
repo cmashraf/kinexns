@@ -24,6 +24,7 @@ output_dict_rev = dict(zip(output_dict.values(), output_dict.keys()))
 rates_f = build_rate_eqn(kmatrix, reacdict[0], output_dict_rev, human = 'no', forward = 'yes')
 rates_r = build_rate_eqn(kmatrix, reacdict[1], output_dict_rev, human = 'no', forward = 'no')
 dydt = build_dydt_list(rates_f, rates_r, specieslist[2], species_rxns, human='no')    
+dydt_y = build_dydt_list(rates_f, rates_r, specieslist[2], species_rxns, human='yes')    
 
 
 class TestSetPaths(unittest.TestCase):
@@ -41,8 +42,8 @@ class TestSetPaths(unittest.TestCase):
         self.assertEqual('compositionlist.dat', paths[2].split('/')[-1])
 
 
-class TestGetSpecieslist(unittest.TestCase):
-    """Tests for get_specieslist()"""
+class TestBuildSpecieslist(unittest.TestCase):
+    """Tests for build_species_list()"""
 
     def test_correct_num_species(self):
         """Does get_specieslist() return the correct number of species (with
@@ -143,3 +144,11 @@ class TestBuildDYDTList(unittest.TestCase):
 
     def test_returns_expected_values(self):
         self.assertEqual(dydt[5], 'd[F]/dt = +1*kf(T,3) * y[0]**1.0 -1*kr(T,3) * y[3]**1.0 * y[5]**1.0 ')
+
+    def test_human_parameter_works(self):
+        """Does the parameter, "human" work as expected?"""
+        self.assertEqual(dydt_y[1],
+                         'd[B]/dt = -1*rate_f[0] +1*rate_r[0] -1*rate_f[2] +1*rate_r[2] ')
+
+if __name__ == '__main__':
+    unittest.main()

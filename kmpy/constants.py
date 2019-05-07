@@ -5,6 +5,7 @@ modules.
 
 #  Universal gas constant [J mol^-1 K^-1]
 GAS_CONST = 8.314
+PR_ATM = 101325
 #  The cooling rate in *C/min to use if a cool down period is specified
 COOL_RATE = -13
 #  Tolerances for ODE solver

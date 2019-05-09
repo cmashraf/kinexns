@@ -233,18 +233,19 @@ def build_free_energy_dict(free_energy_path, T):
     
     df = pd.read_csv(free_energy_path, sep = '\t')
 
-    if str(T)+'K' in df.columns:
-        df['Free Energy @' + str(T) +'K'] = df['Zero_point'] + df[str(T)+'K']
+    if "{}K".format(T) in df.columns:
+        df["Free Energy @{}K".format(T)] = df['Zero_point'] + df["{}K".format(T)]
     else:
         temp_low = math.floor(T / 100.0)* 100
         temp_high = math.ceil(T / 100.0)* 100
-        df[str(T)+'K'] = ((df[str(temp_high)+'K'] - df[str(temp_low)+'K'])
-                          * (T - temp_low) / (temp_high - temp_low) +
-                           df[str(temp_low)+'K'])
-        df['Free Energy @' + str(T) +'K'] = df['Zero_point'] + df[str(T)+'K']
+        df["{}K".format(T)] = ((df["{}K".format(temp_high)] -
+                               df["{}K".format(temp_low)])
+                               * (T - temp_low) / (temp_high - temp_low) +
+                               df["{}K".format(temp_low)])
+        df["Free Energy @{}K".format(T)] = df['Zero_point'] + df["{}K".format(T)]
     #df.tail()
     
-    free_energy = dict([(i, a) for i, a  in zip(df.smiles, df['Free Energy @' + str(T) +'K'])])
+    free_energy = dict([(i, a) for i, a  in zip(df.smiles, df["Free Energy @{}K".format(T)])])
     
     return free_energy
 

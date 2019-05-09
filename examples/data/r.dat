@@ -1,0 +1,10 @@
+-1_O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O,1_O,1_OC1=COC[C@@H](O)[C@@H]1O
+-1_O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O,1_O,1_OC1=C[C@@H](O)[C@H](O)OC1
+-1_O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O,1_O,1_O[C@H]1C=CO[C@@H](O)[C@@H]1O
+-1_O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O,1_O=C[C@@H](O)[C@H](O)[C@@H](O)CO
+-1_O[C@H]1C=CO[C@@H](O)[C@@H]1O,1_O=C[C@H](O)[C@@H](O)/C=C\O
+-1_O=C[C@H](O)[C@@H](O)/C=C\O,1_O=CC[C@H](O)[C@@H](O)C=O
+-1_O=CC[C@H](O)[C@@H](O)C=O,1_O=CCO,1_O=CCC=O
+-1_O=CC[C@H](O)[C@@H](O)C=O,1_O,1_O=C/C=C\[C@@H](O)C=O
+-1_O[C@H]1C=CO[C@@H](O)[C@@H]1O,1_O,1_OC1=COC=C[C@@H]1O
+-1_OC1=C[C@@H](O)[C@H](O)OC1,1_O=C[C@H](O)/C=C(/O)CO

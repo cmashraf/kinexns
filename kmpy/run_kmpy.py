@@ -26,7 +26,7 @@ sys.path.insert(0, cwd)
 
 #  These are the files and paths that will be referenced in this program:
 myPath = os.path.dirname(os.path.abspath(__file__))
-file_reactionlist, file_rateconstantlist, file_compositionlist\
+file_reactionlist, file_rateconstantlist, file_free_energy\
     = ode_builder.set_paths(myPath)
 working_directory = 'results_dir'
 if not os.path.exists(working_directory):
@@ -65,17 +65,25 @@ reac_species =\
                                         unique_species)
 
 # building forward rate constants
-temperature = 298
+temp = 573
 
 forward_rate_constants =\
-    ode_builder.build_kmatrix_forward(file_rateconstantlist,
-                                      temperature)
+    ode_builder.build_kmatrix_forward(file_rateconstantlist, temp)
 print(forward_rate_constants)
+# building the free energy dictionary
+free_energy_dict = ode_builder.build_free_energy_dict(file_free_energy, temp)
+
+# Building reverse rate constants
+reverse_rate_constants = \
+    ode_builder.build_kmatrix_reverse(reac_prod_list, free_energy_dict,
+                                      forward_rate_constants,temp)
+
+#print(reverse_rate_constants)
 # building the forward and reverse rate equations for each reaction
 rates_f = ode_builder.build_rate_eqn(forward_rate_constants,
                                      reac_dict, indices_to_species,
                                      human='no', forward='yes')
-rates_r = ode_builder.build_rate_eqn(forward_rate_constants,
+rates_r = ode_builder.build_rate_eqn(reverse_rate_constants,
                                      prod_dict, indices_to_species,
                                      human='no', forward='yes')
 

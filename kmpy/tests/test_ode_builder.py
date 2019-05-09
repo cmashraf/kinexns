@@ -45,7 +45,7 @@ class TestSetPaths(unittest.TestCase):
         self.assertEqual('complete_reaction_list.dat', paths[0].split('/')[-1])
         self.assertEqual('complete_rateconstant_list.dat',
                          paths[1].split('/')[-1])
-        self.assertEqual('compositionlist.dat', paths[2].split('/')[-1])
+        self.assertEqual('free_energy_library.dat', paths[2].split('/')[-1])
 
 
 class TestBuildSpecieslist(unittest.TestCase):
@@ -90,10 +90,10 @@ class TestBuildKMatrix(unittest.TestCase):
     def test_correct_k_values(self):
         """Are the entries from build_k_matrix() what we expect?"""
         # kmatrix=build_kmatrix_forward(paths[1], 298)
-        self.assertEqual(kmatrix[0], 2.287460534686544e-09)
-        self.assertEqual(kmatrix[1], 1.526499549219028e-28)
-        self.assertEqual(kmatrix[2], 7.640134676963482e-48)
-        self.assertEqual(kmatrix[3], 3.399012999643825e-67)
+        self.assertEqual(kmatrix[0], 8.595861282854891e-27)
+        self.assertEqual(kmatrix[1], 8.595861282854891e-27)
+        self.assertEqual(kmatrix[2], 3.532183477829764e-28)
+        self.assertEqual(kmatrix[3], 1.0954122596778074e-21)
 
 
 class TestBuildReactantDict(unittest.TestCase):

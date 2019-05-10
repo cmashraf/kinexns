@@ -1,5 +1,6 @@
 import numpy as np
 from .constants import GAS_CONST, PR_ATM
+from .constants import KCAL_JL, HT_JL
 import math
 import pandas as pd
 
@@ -199,7 +200,7 @@ class Kinetic_params(object):
 
         self.forward_rates = (eval(parameters[0]) *
                               np.exp(- eval(parameters[2]) *
-                              4180/(GAS_CONST * T)))
+                              KCAL_JL /(GAS_CONST * T)))
         return self.forward_rates
 
 
@@ -256,7 +257,8 @@ def build_free_energy_dict(free_energy_path, T):
     return free_energy
 
 
-def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
+# def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
+def build_kmatrix_reverse(complete_list, free_energy):
     """
     Calculate the reverse rate constants of all the reactions.
  This is done in three steps
@@ -310,15 +312,15 @@ def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
         mol_change.append(n_prod - n_reac)
         # print(mol_change)
         gibbs_energy_list.append((prod_free_energy - reac_free_energy)
-                                 * 2625.5)
+                                 * HT_JL)
 
-    equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * T))
-                             for n in gibbs_energy_list]
-    reverse_rates = [(a / b) * 1000 * (GAS_CONST * T / PR_ATM) ** c
-                     if c < 3 else 0 for (a, b, c) in zip(forward_rates,
-                     equilibrium_constants, mol_change)]
+    # equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * T))
+    #                         for n in gibbs_energy_list]
+    # reverse_rates = [(a / b) * 1000 * (GAS_CONST * T / PR_ATM) ** c
+    #                 if c < 3 else 0 for (a, b, c) in zip(forward_rates,
+    #                 equilibrium_constants, mol_change)]
 
-    return reverse_rates
+    return gibbs_energy_list, mol_change
 
 
 def build_reac_prod_dict(reac_list, prod_list, speciesindices):

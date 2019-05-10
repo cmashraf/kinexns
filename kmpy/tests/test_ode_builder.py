@@ -21,7 +21,7 @@ output_dict = {build_species_list(paths[0])[2][i]: i
                for i in range(0, len(build_species_list(paths[0])[2]))}
 species_rxns = build_reac_species_dict(reac_prod_list, specieslist[2])
 reacdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
-kmatrix = build_kmatrix_forward(paths[1], 298)
+kmatrix = build_kmatrix_forward(paths[1], 573)
 output_dict_rev = dict(zip(output_dict.values(), output_dict.keys()))
 rates_f = build_rate_eqn(kmatrix, reacdict[0],
                          output_dict_rev, human='no', forward='yes')
@@ -85,15 +85,15 @@ class TestBuildKMatrix(unittest.TestCase):
 
     def test_correct_length(self):
         """Does build_k_matrix() return a list of the correct length?"""
-        self.assertEqual(len(build_kmatrix_forward(paths[1], 298)), 4)
+        self.assertEqual(len(build_kmatrix_forward(paths[1], 573)), 4)
 
     def test_correct_k_values(self):
         """Are the entries from build_k_matrix() what we expect?"""
         # kmatrix=build_kmatrix_forward(paths[1], 298)
-        self.assertEqual(kmatrix[0], 8.595861282854891e-27)
-        self.assertEqual(kmatrix[1], 8.595861282854891e-27)
-        self.assertEqual(kmatrix[2], 3.532183477829764e-28)
-        self.assertEqual(kmatrix[3], 1.0954122596778074e-21)
+        self.assertEqual(kmatrix[0], 9.070586400466592e-07)
+        self.assertEqual(kmatrix[1], 9.070586400466592e-07)
+        self.assertEqual(kmatrix[2], 1.8791556907858517e-07)
+        self.assertEqual(kmatrix[3], 3.548590208923674e-05)
 
 
 class TestBuildReactantDict(unittest.TestCase):

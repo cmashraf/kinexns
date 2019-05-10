@@ -257,8 +257,7 @@ def build_free_energy_dict(free_energy_path, T):
     return free_energy
 
 
-# def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
-def build_kmatrix_reverse(complete_list, free_energy):
+def build_free_energy_change(complete_list, free_energy):
     """
     Calculate the reverse rate constants of all the reactions.
  This is done in three steps
@@ -322,6 +321,21 @@ def build_kmatrix_reverse(complete_list, free_energy):
 
     return gibbs_energy_list, mol_change
 
+
+def build_kmatrix_reverse(complete_list, free_energy,
+                          forward_rates, T):
+    
+    gibbs_energy, change_mol = build_free_energy_change(complete_list,
+                                                        free_energy)
+
+    equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * T))
+                             for n in gibbs_energy]
+
+    reverse_rates = [(a / b) * 1000 * (GAS_CONST * T / PR_ATM) ** c 
+                     if c < 3 else 0 for (a, b, c) in
+                     zip(forward_rates, equilibrium_constants, change_mol)]
+
+    return reverse_rates
 
 def build_reac_prod_dict(reac_list, prod_list, speciesindices):
     """

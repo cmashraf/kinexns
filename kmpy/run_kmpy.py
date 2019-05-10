@@ -11,8 +11,8 @@ import os
 import sys
 from . import ode_builder
 
-import numpy as np
-from .constants import GAS_CONST, PR_ATM
+# import numpy as np
+# from .constants import GAS_CONST, PR_ATM
 # from .constants import KCAL_JL, HT_JL
 # import cPickle as pickle
 
@@ -76,16 +76,19 @@ print(forward_rate_constants)
 free_energy_dict = ode_builder.build_free_energy_dict(file_free_energy, temp)
 
 # Building reverse rate constants
-gibbs_energy, change_mol = \
-    ode_builder.build_kmatrix_reverse(reac_prod_list, free_energy_dict)
+# gibbs_energy, change_mol = \
+#    ode_builder.build_free_energy_change(reac_prod_list, free_energy_dict)
 
-equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * temp))
-                         for n in gibbs_energy]
+# equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * temp))
+#                         for n in gibbs_energy]
 
-reverse_rate_constants = [(a / b) * 1000 * (GAS_CONST * temp / PR_ATM) ** c
-                          if c < 3 else 0 for (a, b, c) in
-                          zip(forward_rate_constants, equilibrium_constants,
-                          change_mol)]
+# reverse_rate_constants = [(a / b) * 1000 * (GAS_CONST * temp / PR_ATM) ** c
+#                          if c < 3 else 0 for (a, b, c) in
+#                          zip(forward_rate_constants, equilibrium_constants,
+#                          change_mol)]
+reverse_rate_constants = \
+    ode_builder.build_kmatrix_reverse(reac_prod_list, free_energy_dict,
+                                      forward_rate_constants, temp)
 
 # print(reverse_rate_constants)
 # building the forward and reverse rate equations for each reaction

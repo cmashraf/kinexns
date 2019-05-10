@@ -3,6 +3,7 @@ from .constants import GAS_CONST, PR_ATM
 import math
 import pandas as pd
 
+
 def set_paths(myPath):
 
     """
@@ -212,11 +213,13 @@ def build_kmatrix_forward(rateconstantlist, temp):
 
     return rate_constants
 
+
 def build_free_energy_dict(free_energy_path, T):
     """
-    Build a dictionary of free energy at a given temperature for all the species 
-    present in the mechanism. It reads the file free_energy_path which is basically
-    a library of gibbs free energy correction at different molecules at different temperatures.
+    Build a dictionary of free energy at a given temperature for all
+    the species present in the mechanism. It reads the file free_energy_path
+    which is basically a library of gibbs free energy correction at
+    different molecules at different temperatures.
     Parameters
     ----------
     completereactionlist : str
@@ -227,50 +230,56 @@ def build_free_energy_dict(free_energy_path, T):
     -------
     free_energy.    : dict
                     a dictionary where keys are unique species and values
-                    are free energy of species at a given temperature 
+                    are free energy of species at a given temperature
                     build from free_energy_library.dat
     """
-    
-    df = pd.read_csv(free_energy_path, sep = '\t')
+
+    df = pd.read_csv(free_energy_path, sep='\t')
 
     if "{}K".format(T) in df.columns:
-        df["Free Energy @{}K".format(T)] = df['Zero_point'] + df["{}K".format(T)]
+        df["Free Energy @{}K".format(T)] = (df['Zero_point'] +
+                                            df["{}K".format(T)])
     else:
-        temp_low = math.floor(T / 100.0)* 100
-        temp_high = math.ceil(T / 100.0)* 100
+        temp_low = math.floor(T / 100.0) * 100
+        temp_high = math.ceil(T / 100.0) * 100
         df["{}K".format(T)] = ((df["{}K".format(temp_high)] -
                                df["{}K".format(temp_low)])
                                * (T - temp_low) / (temp_high - temp_low) +
                                df["{}K".format(temp_low)])
-        df["Free Energy @{}K".format(T)] = df['Zero_point'] + df["{}K".format(T)]
-    #df.tail()
-    
-    free_energy = dict([(i, a) for i, a  in zip(df.smiles, df["Free Energy @{}K".format(T)])])
-    
+        df["Free Energy @{}K".format(T)] = (df['Zero_point'] +
+                                            df["{}K".format(T)])
+    # df.tail()
+
+    free_energy = dict([(i, a) for i, a in zip(df.smiles,
+                       df["Free Energy @{}K".format(T)])])
+
     return free_energy
+
 
 def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
     """
-    Calculate the reverse rate constants of all the reactions. There are two steps 
-    doing this
+    Calculate the reverse rate constants of all the reactions.
+    There are two steps doing this
     1. Calculate the change in free energy for each reaction
             delG = G(products) - G(reactanat)
-    This is calculated from the complete lists of reactions and free_energy_dict
+    This is calculated from the complete lists of reactions
+    and free_energy_dict
     2. Use delG to calculate the equlilibrium constant
             Keq = exp (- delG/Gas Const * Temp)
     3. Use the following equation to calculate the reverse rate constant
             Keq = Kf / Kr * (Gas Const * Temp / Pressure)^n
-    where n = total number of product molecules - total number of reactant molecules
+    where n = total number of product molecules -
+              total number of reactant molecules
     ----------
     complete_list        : list
-                           A list of all the reactions with reactant and 
+                           A list of all the reactions with reactant and
                          product species and their stoichimetric coeffs
     free_energy          : dict
                           A dictionary of free energies of all the species
-                          at a given temperature, obtained from 
+                          at a given temperature, obtained from
                           build_free_energy_dict function
-    forward_rate         : A list of forward rate constants for all the reactions
-                         obtained from build_forward_reaction_rates
+    forward_rate         : A list of forward rate constants for all the
+                         reactions obtained from build_forward_reaction_rates
     T                    : float
                            temperature to calculate free energy
     Returns
@@ -278,18 +287,17 @@ def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
      reverse_rates       : list
                          A list of reverse rate constants
     """
-    
-    
+
     mol_change = []
     gibbs_energy_list = []
 
-    for i, item in enumerate (complete_list):
+    for i, item in enumerate(complete_list):
         n_reac = 0
         n_prod = 0
         reac_free_energy = 0
         prod_free_energy = 0
         for entry in item:
-        
+
             if float(entry[0]) < 0:
                 n_reac = n_reac + abs(float(entry[0]))
                 reac_free_energy = (free_energy[entry[1]] +
@@ -298,17 +306,20 @@ def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
                 prod_free_energy = (free_energy[entry[1]] +
                                     abs(float(entry[0])) * prod_free_energy)
                 n_prod = n_prod + abs(float(entry[0]))
-        #print(n_reac)
+        # print(n_reac)
         mol_change.append(n_prod - n_reac)
-        #print(mol_change)
-        gibbs_energy_list.append((prod_free_energy - reac_free_energy) * 2625.5)
-    
-    equilibrium_constants = [np.exp(-n*1000/(GAS_CONST * T)) for n in gibbs_energy_list]
-    reverse_rates = [(a / b)* 1000 * (GAS_CONST * T / PR_ATM)**c
+        # print(mol_change)
+        gibbs_energy_list.append((prod_free_energy - reac_free_energy)
+                                 * 2625.5)
+
+    equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * T))
+                             for n in gibbs_energy_list]
+    reverse_rates = [(a / b) * 1000 * (GAS_CONST * T / PR_ATM) ** c
                      if c < 3 else 0 for (a, b, c) in zip(forward_rates,
                      equilibrium_constants, mol_change)]
-    
+
     return reverse_rates
+
 
 def build_reac_prod_dict(reac_list, prod_list, speciesindices):
     """

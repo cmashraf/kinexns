@@ -76,9 +76,9 @@ free_energy_dict = ode_builder.build_free_energy_dict(file_free_energy, temp)
 # Building reverse rate constants
 reverse_rate_constants = \
     ode_builder.build_kmatrix_reverse(reac_prod_list, free_energy_dict,
-                                      forward_rate_constants,temp)
+                                      forward_rate_constants, temp)
 
-#print(reverse_rate_constants)
+# print(reverse_rate_constants)
 # building the forward and reverse rate equations for each reaction
 rates_f = ode_builder.build_rate_eqn(forward_rate_constants,
                                      reac_dict, indices_to_species,

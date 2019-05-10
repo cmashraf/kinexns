@@ -81,13 +81,13 @@ class Reaction(object):
             # print(self.species_names)
         return self.products_names
 
-    def uniqueSpeciesName(self, line, species_list):
+    def uniqueSpeciesName(self, line, specieslist):
         """building the unique species list
         Parameters
         ____________
         line        : str
                     line from the files
-        species_list :     list
+        specieslist :     list
                             A list of species already in the mechanism
         Returs
         ____________
@@ -100,12 +100,12 @@ class Reaction(object):
         for spec in line.split(','):
             # self.uniqueSpeciesList = species_list
             #  If the species has already been added to the list then move on.
-            if spec.split('_')[1].split()[0] in species_list:
-                self.uniqueSpeciesList = species_list
+            if spec.split('_')[1].split()[0] in specieslist:
+                self.uniqueSpeciesList = specieslist
                 continue
             else:
                 # print(self.uniqueSpeciesList)
-                self.uniqueSpeciesList = species_list
+                self.uniqueSpeciesList = specieslist
                 self.uniqueSpeciesList.append(spec.split('_')[1].split()[0])
             # print(spec.split('_')[1].split()[0])
         return self.uniqueSpeciesList
@@ -259,7 +259,7 @@ def build_free_energy_dict(free_energy_path, T):
 def build_kmatrix_reverse(complete_list, free_energy, forward_rates, T):
     """
     Calculate the reverse rate constants of all the reactions.
-    There are two steps doing this
+ This is done in three steps
     1. Calculate the change in free energy for each reaction
             delG = G(products) - G(reactanat)
     This is calculated from the complete lists of reactions

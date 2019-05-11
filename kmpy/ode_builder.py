@@ -22,9 +22,9 @@ def set_paths(myPath):
 
     reactionlist_path = myPath + '/data/complete_reaction_list.dat'
     rateconstantlist_path = myPath + '/data/complete_rateconstant_list.dat'
-    compositionlist_path = myPath + '/data/free_energy_library.dat'
+    free_energy_path = myPath + '/data/free_energy_library.dat'
 
-    return reactionlist_path, rateconstantlist_path, compositionlist_path
+    return reactionlist_path, rateconstantlist_path, free_energy_path
 
 
 class Reaction(object):

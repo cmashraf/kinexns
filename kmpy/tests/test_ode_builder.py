@@ -10,6 +10,9 @@ from ..ode_builder import set_paths, build_species_list
 from ..ode_builder import build_kmatrix_forward, build_reac_prod_dict
 from ..ode_builder import build_reac_species_dict, build_rate_eqn
 from ..ode_builder import build_dydt_list
+from ..ode_builder import build_free_energy_dict, build_free_energy_change
+from ..ode_builder import build_kmatrix_reverse
+
 myPath = os.path.dirname(os.path.abspath(__file__))
 # from ..constants import GAS_CONST
 
@@ -21,11 +24,16 @@ output_dict = {build_species_list(paths[0])[2][i]: i
                for i in range(0, len(build_species_list(paths[0])[2]))}
 species_rxns = build_reac_species_dict(reac_prod_list, specieslist[2])
 reacdict = build_reac_prod_dict(specieslist[0], specieslist[1], output_dict)
-kmatrix = build_kmatrix_forward(paths[1], 573)
+kmatrix_f = build_kmatrix_forward(paths[1], 573)
 output_dict_rev = dict(zip(output_dict.values(), output_dict.keys()))
-rates_f = build_rate_eqn(kmatrix, reacdict[0],
+free_energy_dict = build_free_energy_dict(paths[2], 573)
+free_energy_change, mol_change = build_free_energy_change(reac_prod_list,
+                                                          free_energy_dict)
+kmatrix_r = build_kmatrix_reverse(reac_prod_list, free_energy_dict,
+                                  kmatrix_f, 573)
+rates_f = build_rate_eqn(kmatrix_f, reacdict[0],
                          output_dict_rev, human='no', forward='yes')
-rates_r = build_rate_eqn(kmatrix, reacdict[1],
+rates_r = build_rate_eqn(kmatrix_r, reacdict[1],
                          output_dict_rev, human='no', forward='no')
 dydt = build_dydt_list(rates_f, rates_r, specieslist[2],
                        species_rxns, human='no')
@@ -83,17 +91,51 @@ class TestBuildKMatrix(unittest.TestCase):
     """Tests for build_k_matrix() assuming the model as published by Hough
     et al, 2016"""
 
-    def test_correct_length(self):
+    def test_correct_length_f(self):
         """Does build_k_matrix() return a list of the correct length?"""
         self.assertEqual(len(build_kmatrix_forward(paths[1], 573)), 4)
 
-    def test_correct_k_values(self):
+    def test_correct_k_values_f(self):
         """Are the entries from build_k_matrix() what we expect?"""
         # kmatrix=build_kmatrix_forward(paths[1], 298)
-        self.assertEqual(kmatrix[0], 9.070586400466592e-07)
-        self.assertEqual(kmatrix[1], 9.070586400466592e-07)
-        self.assertEqual(kmatrix[2], 1.8791556907858517e-07)
-        self.assertEqual(kmatrix[3], 3.548590208923674e-05)
+        self.assertEqual(kmatrix_f[0], 9.070586400466592e-07)
+        self.assertEqual(kmatrix_f[1], 9.070586400466592e-07)
+        self.assertEqual(kmatrix_f[2], 1.8791556907858517e-07)
+        self.assertEqual(kmatrix_f[3], 3.548590208923674e-05)
+
+
+class TestBuildKMatrix_rev(unittest.TestCase):
+    """Tests for build_k_matrix() assuming the model as published by Hough
+    et al, 2016"""
+
+    def test_correct_length(self):
+        """Does build_k_matrix() return a list of the correct length?"""
+        self.assertEqual(len(free_energy_dict), len(specieslist[2]))
+
+    def test_correct_length_kmatrix_r(self):
+        """Does build_k_matriix() return a list of the correct length?"""
+        self.assertEqual(len(kmatrix_r), 4)
+
+    def test_correct_length_free_energy(self):
+        """Does build_k_matriix() return a list of the correct length?"""
+        self.assertEqual(len(free_energy_change), 4)
+
+    def test_correct_free_energy_values(self):
+        self.assertEqual(free_energy_dict['B'], -76.44006077)
+        self.assertEqual(free_energy_dict['D'], -496.14661846999996)
+        self.assertEqual(free_energy_dict['F'], -572.5674811700001)
+
+    def test_correct_free_energy_cahnge(self):
+        self.assertEqual(free_energy_change[0], -6.293953619833474)
+        self.assertEqual(free_energy_change[2], -32.32967185957523)
+
+    def test_correct_k_values_r(self):
+        """Are the entries from build_k_matrix() what we expect?"""
+        # kmatrix=build_kmatrix_forward(paths[1], 298)
+        self.assertEqual(kmatrix_r[0], 1.1379057686786213e-05)
+        self.assertEqual(kmatrix_r[1], 2.895704050369846e-08)
+        self.assertEqual(kmatrix_r[2], 9.975478106112853e-09)
+        self.assertEqual(kmatrix_r[3], 0.9483448135351068)
 
 
 class TestBuildReactantDict(unittest.TestCase):
@@ -106,9 +148,8 @@ class TestBuildReactantDict(unittest.TestCase):
     def test_returns_expected_values(self):
         """Does the reactant_dict have the values we expect?"""
         self.assertEqual(reacdict[0][1], [[0, 1.0]])
-        self.assertEqual(reacdict[0][2], [[1, 1.0], [2, 1.0]])
-        self.assertEqual(reacdict[1][1], [[4, 1.0]])
-        self.assertEqual(reacdict[1][3], [[3, 1.0], [5, 1.0]])
+        self.assertEqual(reacdict[0][2], [[0, 1.0]])
+        self.assertEqual(reacdict[1][1], [[1, 1.0], [3, 1.0]])
 
 
 class TestBuildSpeciesRxnsDict(unittest.TestCase):
@@ -121,11 +162,9 @@ class TestBuildSpeciesRxnsDict(unittest.TestCase):
     def test_returns_expected_values(self):
         """Does the reactant_dict have the values we expect?"""
         self.assertEqual(species_rxns['B'],
-                         [[0, -1, '-1', '+1'], [2, -1, '-1', '+1']])
-        self.assertEqual(species_rxns['D'],
-                         [[0, 1, '+1', '-1'], [2, 1, '+1', '-1'],
-                         [3, 1, '+1', '-1']])
-        self.assertEqual(species_rxns['F'], [[3, 1, '+1', '-1']])
+                         [[0, 1, '+1', '-1'], [1, 1, '+1', '-1'],
+                          [2, 1, '+1', '-1']])
+        self.assertEqual(species_rxns['D'], [[1, 1, '+1', '-1']])
 
 
 class TestBuildRatesEqn(unittest.TestCase):
@@ -138,9 +177,9 @@ class TestBuildRatesEqn(unittest.TestCase):
     def test_returns_expected_values(self):
         """Are the expected rate expressions returned?"""
         self.assertEqual(rates_f[0],
-                         'rate_f[0] = kf(T,0) * y[0]**1.0 * y[1]**2.0 ')
+                         'rate_f[0] = kf(T,0) * y[0]**1.0 ')
         self.assertEqual(rates_r[0],
-                         'rate_r[0] = kr(T,0) * y[2]**1.0 * y[3]**1.0 ')
+                         'rate_r[0] = kr(T,0) * y[1]**1.0 * y[2]**1.0 ')
 
 
 class TestBuildDYDTList(unittest.TestCase):
@@ -153,13 +192,12 @@ class TestBuildDYDTList(unittest.TestCase):
     def test_returns_expected_values(self):
         self.assertEqual(dydt[5],
                          'd[F]/dt = +1*kf(T,3) * y[0]**1.0 '
-                         '-1*kr(T,3) * y[3]**1.0 * y[5]**1.0 ')
+                         '-1*kr(T,3) * y[5]**1.0 ')
 
     def test_human_parameter_works(self):
         """Does the parameter, "human" work as expected?"""
-        self.assertEqual(dydt_y[1],
-                         'd[B]/dt = -1*rate_f[0] +1*rate_r[0] '
-                         '-1*rate_f[2] +1*rate_r[2] ')
+        self.assertEqual(dydt_y[5],
+                         'd[F]/dt = +1*rate_f[3] -1*rate_r[3] ')
 
 
 if __name__ == '__main__':

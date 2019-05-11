@@ -49,6 +49,7 @@ reac_prod_list = [react + prod for react, prod in
 species_indices = {unique_species[i]: i for i in
                    range(0, len(unique_species))}
 
+print(species_indices)
 # reversing the species_indices matrix, indexes are the keys now
 indices_to_species = dict(zip(species_indices.values(),
                           species_indices.keys()))
@@ -71,14 +72,12 @@ temp = 573
 
 forward_rate_constants =\
     ode_builder.build_kmatrix_forward(file_rateconstantlist, temp)
-print(forward_rate_constants)
+#print(forward_rate_constants)
 # building the free energy dictionary
 free_energy_dict = ode_builder.build_free_energy_dict(file_free_energy, temp)
-
 # Building reverse rate constants
 # gibbs_energy, change_mol = \
-#    ode_builder.build_free_energy_change(reac_prod_list, free_energy_dict)
-
+#   ode_builder.build_free_energy_change(reac_prod_list, free_energy_dict)
 # equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * temp))
 #                         for n in gibbs_energy]
 
@@ -90,7 +89,7 @@ reverse_rate_constants = \
     ode_builder.build_kmatrix_reverse(reac_prod_list, free_energy_dict,
                                       forward_rate_constants, temp)
 
-# print(reverse_rate_constants)
+print(reverse_rate_constants)
 # building the forward and reverse rate equations for each reaction
 rates_f = ode_builder.build_rate_eqn(forward_rate_constants,
                                      reac_dict, indices_to_species,

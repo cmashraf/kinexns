@@ -3,9 +3,10 @@ from .constants import GAS_CONST, PR_ATM
 from .constants import KCAL_JL, HT_JL
 import math
 import pandas as pd
+import re
 
 
-def set_paths(myPath):
+def set_paths(my_path):
 
     """
     Set the absolute path to required files on the current machine.
@@ -20,9 +21,9 @@ def set_paths(myPath):
                             path to the file `compositionlist.dat`
     """
 
-    reactionlist_path = myPath + '/data/complete_reaction_list.dat'
-    rateconstantlist_path = myPath + '/data/complete_rateconstant_list.dat'
-    free_energy_path = myPath + '/data/free_energy_library.dat'
+    reactionlist_path = my_path + '/data/complete_reaction_list.dat'
+    rateconstantlist_path = my_path + '/data/complete_rateconstant_list.dat'
+    free_energy_path = my_path + '/data/free_energy_library.dat'
 
     return reactionlist_path, rateconstantlist_path, free_energy_path
 
@@ -42,7 +43,7 @@ class Reaction(object):
         self.uniqueSpeciesList = []
         # species_names = []
 
-    def getReactantsName(self, line):
+    def get_reactants_name(self, line):
         """getting the reactants for each reaction
         Parameters
         ____________
@@ -62,7 +63,7 @@ class Reaction(object):
             # print(self.species_names)
         return self.reactants_names
 
-    def getProductsName(self, line):
+    def get_products_name(self, line):
         """getting the products for each reaction
         Parameters
         ____________
@@ -82,7 +83,7 @@ class Reaction(object):
             # print(self.species_names)
         return self.products_names
 
-    def uniqueSpeciesName(self, line, specieslist):
+    def unique_species_name(self, line, specieslist):
         """building the unique species list
         Parameters
         ____________
@@ -121,8 +122,7 @@ def build_species_list(reaction_file):
     reaction_file       : str
                            path to the file `complete_reaction_list.dat`
     Returns
-    __________
-
+    ----------
     reactant_list       : list
                          a list of the reactants and their stoichiometric
                          coeffs for each reaction
@@ -137,21 +137,23 @@ def build_species_list(reaction_file):
     reactant_list = []
     product_list = []
     species_name = []
+    species_list = []
 
     for line in open(reaction_file, 'r').readlines():
         reac = Reaction()
-        reactant_list.append(reac.getReactantsName(line))
-        product_list.append(reac.getProductsName(line))
+        reactant_list.append(reac.get_reactants_name(line))
+        product_list.append(reac.get_products_name(line))
         current_species = species_name
         # print(current_species)
-        species_list = reac.uniqueSpeciesName(line, current_species)
+        species_list = reac.unique_species_name(line, current_species)
         # print(species_name)
+
     species_list.sort()
 
     return reactant_list, product_list, species_list
 
 
-class Kinetic_params(object):
+class KineticParams(object):
     """
     This is the kinetic params class, they read the rates constant file,
     and generate the rate constants from the Arrhenius equations
@@ -164,7 +166,7 @@ class Kinetic_params(object):
         # self.uniqueSpeciesList = []
         # species_names = []
 
-    def getForwardRateParameters(self, line):
+    def get_forward_rate_parameters(self, line):
         """
         Reading the parameter file and parsing the useful infos
         Parameters
@@ -184,7 +186,7 @@ class Kinetic_params(object):
 
         return self.forward_rate_params
 
-    def getForwardRateConstant(self, parameters, T):
+    def get_forward_rate_constants(self, parameters, temp):
         """
         Generating the forward rate constants for each reaction
         Parameters
@@ -200,7 +202,7 @@ class Kinetic_params(object):
 
         self.forward_rates = (eval(parameters[0]) *
                               np.exp(- eval(parameters[2]) *
-                              KCAL_JL /(GAS_CONST * T)))
+                              KCAL_JL / (GAS_CONST * temp)))
         return self.forward_rates
 
 
@@ -208,14 +210,14 @@ def build_kmatrix_forward(rateconstantlist, temp):
 
     rate_constants = []
     for line in open(rateconstantlist, 'r').readlines():
-        f_params = Kinetic_params()
-        params = f_params.getForwardRateParameters(line)
-        rate_constants.append(f_params.getForwardRateConstant(params, temp))
+        f_params = KineticParams()
+        params = f_params.get_forward_rate_parameters(line)
+        rate_constants.append(f_params.get_forward_rate_constants(params, temp))
 
     return rate_constants
 
 
-def build_free_energy_dict(free_energy_path, T):
+def build_free_energy_dict(free_energy_path, temp):
     """
     Build a dictionary of free energy at a given temperature for all
     the species present in the mechanism. It reads the file free_energy_path
@@ -223,9 +225,9 @@ def build_free_energy_dict(free_energy_path, T):
     different molecules at different temperatures.
     Parameters
     ----------
-    completereactionlist : str
+    free_energy_path     : str
                            path to the file `free_energy_library.dat`
-    T                    : float
+    temp                 : float
                            temperature to calculate free energy
     Returns
     -------
@@ -237,40 +239,33 @@ def build_free_energy_dict(free_energy_path, T):
 
     df = pd.read_csv(free_energy_path, sep='\t')
 
-    if "{}K".format(T) in df.columns:
-        df["Free Energy @{}K".format(T)] = (df['Zero_point'] +
-                                            df["{}K".format(T)])
+    if "{}K".format(temp) in df.columns:
+        df["Free Energy @{}K".format(temp)] = df['electronic_energy'] +\
+                                              df["{}K".format(temp)]
     else:
-        temp_low = math.floor(T / 100.0) * 100
-        temp_high = math.ceil(T / 100.0) * 100
-        df["{}K".format(T)] = ((df["{}K".format(temp_high)] -
-                               df["{}K".format(temp_low)])
-                               * (T - temp_low) / (temp_high - temp_low) +
-                               df["{}K".format(temp_low)])
-        df["Free Energy @{}K".format(T)] = (df['Zero_point'] +
-                                            df["{}K".format(T)])
-    # df.tail()
+        temp_low = math.floor(temp / 100.0) * 100
+        temp_high = math.ceil(temp / 100.0) * 100
+        df["{}K".format(temp)] = (df["{}K".format(temp_high)] -
+                                  df["{}K".format(temp_low)]) *\
+                                 (temp - temp_low) / (temp_high - temp_low)\
+                                 + df["{}K".format(temp_low)]
+        df["Free Energy @{}K".format(temp)] = df['electronic_energy'] + \
+                                              df["{}K".format(temp)]
+# print(df.head())
 
-    free_energy = dict([(i, a) for i, a in zip(df.smiles,
-                       df["Free Energy @{}K".format(T)])])
+    free_energy = dict([(i, a) for i, a in
+                        zip(df.smiles, df["Free Energy @{}K".format(temp)])])
 
     return free_energy
 
 
 def build_free_energy_change(complete_list, free_energy):
     """
-    Calculate the reverse rate constants of all the reactions.
- This is done in three steps
-    1. Calculate the change in free energy for each reaction
+    Calculate the free energy changes for all the reactions
             delG = G(products) - G(reactanat)
     This is calculated from the complete lists of reactions
     and free_energy_dict
-    2. Use delG to calculate the equlilibrium constant
-            Keq = exp (- delG/Gas Const * Temp)
-    3. Use the following equation to calculate the reverse rate constant
-            Keq = Kf / Kr * (Gas Const * Temp / Pressure)^n
-    where n = total number of product molecules -
-              total number of reactant molecules
+    Parameters
     ----------
     complete_list        : list
                            A list of all the reactions with reactant and
@@ -279,14 +274,13 @@ def build_free_energy_change(complete_list, free_energy):
                           A dictionary of free energies of all the species
                           at a given temperature, obtained from
                           build_free_energy_dict function
-    forward_rate         : A list of forward rate constants for all the
-                         reactions obtained from build_forward_reaction_rates
-    T                    : float
-                           temperature to calculate free energy
     Returns
     -------
-     reverse_rates       : list
-                         A list of reverse rate constants
+    gibbs_enenrgy_change : list
+                         A list of free energy change for each reaction
+    mol_change           : list
+                         A list of (n_products - n_reactants)
+                         for each reation
     """
 
     mol_change = []
@@ -301,11 +295,13 @@ def build_free_energy_change(complete_list, free_energy):
 
             if float(entry[0]) < 0:
                 n_reac = n_reac + abs(float(entry[0]))
-                reac_free_energy = (free_energy[entry[1]] +
-                                    abs(float(entry[0])) * reac_free_energy)
+                reac_free_energy = (abs(float(entry[0])) *
+                                    free_energy[entry[1]] +
+                                    reac_free_energy)
             else:
-                prod_free_energy = (free_energy[entry[1]] +
-                                    abs(float(entry[0])) * prod_free_energy)
+                prod_free_energy = (abs(float(entry[0])) *
+                                    free_energy[entry[1]]
+                                    + prod_free_energy)
                 n_prod = n_prod + abs(float(entry[0]))
         # print(n_reac)
         mol_change.append(n_prod - n_reac)
@@ -323,217 +319,170 @@ def build_free_energy_change(complete_list, free_energy):
 
 
 def build_kmatrix_reverse(complete_list, free_energy,
-                          forward_rates, T):
-    
+                          forward_rates, temp):
+    """"
+    Calculates the reverse rate constants for all the reactions
+    using the free energy change through the following steps
+    1. Use delG from build_free_energy_change
+    to calculate the equlilibrium constant
+    Keq = exp (- delG/Gas Const * temp)
+    2. Use the following equation to calculate the reverse rate constant
+    Keq = Kf / Kr * (Gas Const * temp / Pressure)^n
+    where n = total number of product molecules -
+    total number of reactant molecules
+    Parameters
+    ----------
+    complete_list        : list
+                           A list of all the reactions with reactant and
+                         product species and their stoichimetric coeffs
+    free_energy          : dict
+                          A dictionary of free energies of all the species
+                          at a given temperature, obtained from
+                          build_free_energy_dict function
+    forward_rates        : A list of forward rate constants for all the
+                         reactions obtained from build_forward_reaction_rates
+    temp                : float
+                           temperature to calculate free energy
+    Returns
+    -------
+    reverse_rates       : list
+                         A list of reverse rate constants
+    """
+
     gibbs_energy, change_mol = build_free_energy_change(complete_list,
                                                         free_energy)
 
-    equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * T))
+    equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * temp))
                              for n in gibbs_energy]
 
-    reverse_rates = [(a / b) * 1000 * (GAS_CONST * T / PR_ATM) ** c 
+    reverse_rates = [(a / b) * (GAS_CONST * temp * 1000 / PR_ATM) ** c
                      if c < 3 else 0 for (a, b, c) in
                      zip(forward_rates, equilibrium_constants, change_mol)]
 
     return reverse_rates
 
-def build_reac_prod_dict(reac_list, prod_list, speciesindices):
+
+def build_stoic_matrix(complete_list, species_list, species_indices):
     """
-    Build a dictionary of the reactants involved in each reaction,
-    along with their stoichiometric coefficients.  The keys of the
-    dictionary are the reaction numbers, the values are lists of lists
-    [[reactant1index, -1*coeff1],...]
+    builds the stoichiometric matrix for the entire mechanism and
+    then builds the rate equations for each reaction.
     Parameters
     ----------
-    completereactionlist : str
-                           path to the file `complete_reaction_list.dat`
-    speciesindices       : dict
-                           the dictionary speciesindices from
-                           get_speciesindices()
+    complete_list    : list
+                      A list of all the reactions with reactant and
+                      product species and their stoichimetric coeffs
+    species_list     : list
+                     A list of unique species in the mechanism
+    species_indices  : dict
+                     the dictionary speciesindices
     Returns
-    -------
-    reactant_dict : dict
-                    a dictionary where keys are reaction numbers and values
-                    are lists of lists with the reactant species id and their
-                    stoichiometric coefficients for each reaction
-    product_dict : dict
-                    a dictionary where keys are reaction numbers and values
-                    are lists of lists with the product species id and their
-                    stoichiometric coefficients for each reaction
-    """
-    reactant_dict = {}
-    for rxnindex, reaction in enumerate(reac_list):
-        reactants = []
-
-        for x in range(len(reaction)):
-            # if the species is a reactant
-            # if float(x.split('_')[0]) < 0:
-            reactants.append([speciesindices[reaction[x][1]],
-                             -1*float(reaction[x][0])])
-            # in preceding line: *-1 because I want the |stoich coeff|
-        reactant_dict[rxnindex] = reactants
-
-    products_dict = {}
-    for rxnindex, reaction in enumerate(prod_list):
-        products = []
-
-        for x in range(len(reaction)):
-            # if the species is a reactant
-            # if float(x.split('_')[0]) < 0:
-            products.append([speciesindices[reaction[x][1]],
-                            1*float(reaction[x][0])])
-            # in preceding line: *-1 because I want the |stoich coeff|
-        products_dict[rxnindex] = products
-    return reactant_dict, products_dict
-
-
-def build_reac_species_dict(reacprodlist, specieslist):
-    """
-    Build a dictionary where keys are species and values are lists with the
-    reactions that species is involved in, that reaction's sign in the net
-    rate equation, and the stoichiometric coefficient of the species in that
-    reaction.
-    Parameters
     ----------
-    reacprodlist : list
-                        a list of both reactants and products and their
-                        stoichiometric co-effs
-    specieslist  : list
-                        a list of unique species in the mecahnism
-
-    Returns
-    -------
-    reac_species : dict
-                   keys are the species in the model; values are lists of
-                   [reaction that species is involved in,
-                   sign of that species in the net rate equation,
-                   sign for forward reaction ('-1', if reactant,
-                   '+1', if product),
-                   sign for backward reaction ('+1', if reactant,
-                   '-1', if product)]
+    matrix           : matrix
+                     stoichiometric matrix for the entire
+                     reaction mechanism
+    rate_final       : str
+                     list of strings of rate equations for each
+                     reaction (both forward and reverse)
     """
-    # specieslist = get_specieslist(set_paths()[0])
-    reac_species = {}
-    for species in specieslist:
-        # This loop makes a list of which reactions "species" takes part in
-        # and what sign that term in the net rate eqn has
-        # and what the stoichiometric coefficient is
-
-        reactions_involved = []
-        for rxnindex, reac_list in enumerate(reacprodlist):
-            for x in range(len(reac_list)):
-                # If the species being iterated over is part of this reaction
-                if species == reac_list[x][1]:
-                    # if the species is a reactant
+    matrix = np.zeros((len(complete_list), len(species_list)), dtype=float)
+    rate_final = []
+    for rxnindex, reac_list in enumerate(complete_list):
+        # rate = ''
+        rate_f = 'kf[%s] ' % rxnindex
+        rate_r = '- kr[%s]' % rxnindex
+        concentration_f = ''
+        concentration_r = ''
+        for x in range(len(reac_list)):
+            species = reac_list[x][1]
+            for i in range(len(species_list)):
+                if i == species_indices[species]:
+                    matrix[rxnindex][i] = float(reac_list[x][0])
                     if float(reac_list[x][0]) < 0:
-                        reactions_involved.append([rxnindex, -1, str(-1),
-                                                  '+'+str(1)])
+                        if abs(float(reac_list[x][0])) == 1:
+                            concentration_f += '* y[%s] ' % i
+                        else:
+                            concentration_f += '* y[%s] ** %s ' \
+                                               % (i, abs(float
+                                                         (reac_list[x][0])))
+                    else:
+                        if abs(float(reac_list[x][0])) == 1:
+                            concentration_r += '* y[%s] ' % i
+                        else:
+                            concentration_r += '* y[%s] ** %s ' \
+                                               % (i, float(reac_list[x][0]))
 
-                    # if the species is a product
-                    if float(reac_list[x][0]) > 0:
-                        reactions_involved.append([rxnindex, 1, '+'+str(1),
-                                                  str(-1)])
-
-        reac_species[species] = reactions_involved
-    return reac_species
+        rate = rate_f + concentration_f + rate_r + concentration_r
+        # print(rate)
+        rate_final.append(rate)
+    return matrix, rate_final
 
 
-def build_rate_eqn(k_mat, r_dict, s_indices, human, forward):
-
-    """ This function writes the list of rate expressions for each reaction.
-    Parameters
-    ----------
-    kmat               : list
-                         A list of reaction rate contstants
-                         (k_forward or k_reverse)
-    r_dict             : dictionary
-                         reactant or product directory
-    s_indices          : dict
-                         the reverse of speciesindices (keys are the indices
-                         and values are the species)
-    human              : str, optional
-                         indicate whether the output of this function should
-                         be formatted for a human to read ('yes'). Default
-                         is 'no'
-    forward             : str
-                        reaction type,if 'yes', it is forward reaction
-                        default is 'yes'
-    Returns
-    -------
-    rates_list : list
-                A list of the rate expressions for all the
-                reactions in the mecahnism
+def build_dydt_list(complete_list, species_list,
+                    species_indices, rev_rate='yes'):
     """
-
-    rates_list = []
-    for i, line in enumerate(k_mat):
-        if forward == 'yes':
-            rate = 'rate_f[%s] = kf(T,%s) ' % (i, i)
-        else:
-            rate = 'rate_r[%s] = kr(T,%s) ' % (i, i)
-        concentrations = ''
-        for entry in r_dict[i]:
-            if entry == 'n':
-                concentrations = '* 0'
-                break
-            else:
-                if human == 'no':
-                    concentrations += '* y[%s]**%s ' % (entry[0], entry[1])
-                elif human == 'yes':
-                    concentrations += '* [%s]**%s ' % \
-                        (s_indices[entry[0]], entry[1])
-                else:
-                    raise ValueError('human must be a string: yes or no')
-
-        rate += concentrations
-
-        # rate = rate_reactant + rate_product
-        rates_list.append(rate)
-
-    return rates_list
-
-
-def build_dydt_list(rates_forward, rates_reverse, specieslist,
-                    species_rxns, human='no'):
-    """This function returns the list of dydt expressions generated for all
-    the reactions from rates_list.
+    builds the stoichiometric matrix for the entire mechanism and
+    then builds the rate equations for each reaction.
     Parameters
     ----------
-    rates_forward      : list
-                         the output of build_rates_list(),
-                         list of forward rates
-    rates_reverse      : list
-                         the output of build_rates_list(),
-                         list of reverse rates
-    specieslist        : list
-                         a list of all the species in the kinetic scheme
-    species_rxns       : dict
-                         dictionary where keys that are the model species and
-                         values are the reactions they are involved in
-    human              : str, optional
-                         indicate whether the output of this function should
-                         be formatted for a human to read ('yes'). Default
-                         is 'no'
+    complete_list    : list
+                      A list of all the reactions with reactant and
+                      product species and their stoichimetric coeffs
+    species_list     : list
+                     A list of unique species in the mechanism
+    species_indices  : dict
+                     the dictionary speciesindices
+    rev_rate         : 'yes' if reverse reactions are considered
+                       'No' if reverse reactions are NOT considered
     Returns
-    -------
+    ----------
     dydt_expressions : list
-                       expressions for the ODEs expressing the concentration
-                       of each species with time
+                     A lsit of all the differential equations
+                     related to the mechanism
     """
+
+    reac_matrix, rate_reac = build_stoic_matrix(complete_list,
+                                                species_list, species_indices)
     dydt_expressions = []
-    for species in specieslist:
-        rate_formation = 'd[%s]/dt = ' % (species)
-        #  "entry" is [reaction# , sign of that reaction, coefficient]
-        for entry in species_rxns[species]:
-            if human == 'no':
-                rate_formation += '%s*%s' % \
-                    (entry[2], rates_forward[entry[0]].split(' = ')[1])
-                rate_formation += '%s*%s' % \
-                    (entry[3], rates_reverse[entry[0]].split(' = ')[1])
-            elif human == 'yes':
-                rate_formation += '%s*rate_f[%s] ' % (entry[2], entry[0])
-                rate_formation += '%s*rate_r[%s] ' % (entry[3], entry[0])
+    for species in species_list:
+        rate_equation = 'dy[%i]/dt = ' % (species_indices[species])
+        i = species_indices[species]
+        for j in range(len(rate_reac)):
+            if reac_matrix[j][i] > 0:
+                if reac_matrix[j][i] == 1.0:
+                    if rev_rate == 'yes':
+                        rate_equation += '+ %s' % (rate_reac[j])
+                    else:
+                        rate_equation += '+ %s' % (re.split('-', rate_reac[j])[0])
+                else:
+                    rate_equation += '+ %1.2f * %s' % \
+                                     (reac_matrix[j][i],
+                                      re.split('-', rate_reac[j])[0])
+                    if rev_rate == 'yes':
+                        rate_equation += '- %1.2f * %s' % \
+                                         (reac_matrix[j][i],
+                                          re.split('-', rate_reac[j])[1])
+                    else:
+                        pass
+            elif reac_matrix[j][i] < 0:
+                if reac_matrix[j][i] == -1.:
+                    rate_equation += '- %s' % (re.split('-', rate_reac[j])[0])
+                    if rev_rate == 'yes':
+                        rate_equation += '+ %s' % \
+                                         (re.split('-', rate_reac[j])[1])
+                    else:
+                        pass
+                else:
+                    rate_equation += '- %1.2f * %s' % \
+                                     (abs(reac_matrix[j][i]),
+                                      re.split('-', rate_reac[j])[0])
+                    if rev_rate == 'yes':
+                        rate_equation += '+ %1.2f * %s' % \
+                                         (abs(reac_matrix[j][i]),
+                                          re.split('-', rate_reac[j])[1])
+                    else:
+                        pass
             else:
-                raise ValueError('human must be a string: yes or no')
-        dydt_expressions.append(rate_formation)
+                pass
+        dydt_expressions.append(rate_equation)
+
     return dydt_expressions

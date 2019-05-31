@@ -2,12 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/examples/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/examples/constants.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/data/complete_rateconstant_list.dat" beforeDir="false" afterPath="$PROJECT_DIR$/examples/data/complete_rateconstant_list.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/data/complete_reaction_list.dat" beforeDir="false" afterPath="$PROJECT_DIR$/examples/data/complete_reaction_list.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/data/free_energy_library.dat" beforeDir="false" afterPath="$PROJECT_DIR$/examples/data/free_energy_library.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/data/reaction_list.dat" beforeDir="false" afterPath="$PROJECT_DIR$/examples/data/reaction_list.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/reaction_class.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/reaction_class.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/data/complete_reaction_list.dat" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/data/complete_reaction_list.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/data/free_energy_library.dat" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/data/free_energy_library.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kmpy/ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/ode_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/run_kmpy.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/run_kmpy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/tests/data/complete_reaction_list.dat" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/tests/data/complete_reaction_list.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/tests/data/free_energy_library.dat" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/tests/data/free_energy_library.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kmpy/tests/test_ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/tests/test_ode_builder.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -21,8 +25,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kmpy/run_kmpy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
+            <state relative-caret-position="999">
+              <caret line="40" selection-start-line="40" selection-end-line="40" />
               <folding>
                 <element signature="e#310#319#0" expanded="true" />
               </folding>
@@ -33,8 +37,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kmpy/ode_builder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-193">
-              <caret line="289" column="6" selection-start-line="289" selection-start-column="6" selection-end-line="289" selection-end-column="6" />
+            <state relative-caret-position="335">
+              <caret line="340" column="34" selection-start-line="340" selection-start-column="34" selection-end-line="340" selection-end-column="34" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -45,8 +49,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/kmpy/tests/test_ode_builder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-21">
-              <caret line="184" column="4" selection-start-line="184" selection-start-column="4" selection-end-line="184" selection-end-column="4" />
+            <state relative-caret-position="643">
+              <caret line="126" column="8" selection-start-line="126" selection-start-column="8" selection-end-line="126" selection-end-column="8" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -64,13 +68,6 @@
       <list>
         <option value="$PROJECT_DIR$/kmpy/ode_builder.py" />
         <option value="$PROJECT_DIR$/kmpy/tests/test_ode_builder.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectConfigurationFiles">
-    <option name="files">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/encodings.xml" />
       </list>
     </option>
   </component>
@@ -109,13 +106,6 @@
               <item name="kmpy" type="462c0819:PsiDirectoryNode" />
               <item name="kmpy" type="462c0819:PsiDirectoryNode" />
               <item name="tests" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="kmpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
               <item name="test_ode_builder.py" type="8704e2dd:PyFileNode" />
             </path>
             <path>
@@ -132,8 +122,9 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="MTConfigurable" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -286,13 +277,13 @@
     <frame x="310" y="216" width="1400" height="1000" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24873096" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24873096" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.3293944" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39910313" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39910313" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3295964" />
@@ -317,23 +308,23 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/kmpy/tests/data/free_energy_library.dat">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/kmpy/run_kmpy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
+        <state relative-caret-position="999">
+          <caret line="40" selection-start-line="40" selection-end-line="40" />
           <folding>
             <element signature="e#310#319#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/kmpy/tests/data/free_energy_library.dat">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/kmpy/ode_builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-193">
-          <caret line="289" column="6" selection-start-line="289" selection-start-column="6" selection-end-line="289" selection-end-column="6" />
+        <state relative-caret-position="335">
+          <caret line="340" column="34" selection-start-line="340" selection-start-column="34" selection-end-line="340" selection-end-column="34" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -342,13 +333,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/kmpy/tests/test_ode_builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-21">
-          <caret line="184" column="4" selection-start-line="184" selection-start-column="4" selection-end-line="184" selection-end-column="4" />
+        <state relative-caret-position="643">
+          <caret line="126" column="8" selection-start-line="126" selection-start-column="8" selection-end-line="126" selection-end-column="8" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>

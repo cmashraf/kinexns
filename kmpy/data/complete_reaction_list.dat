@@ -31,7 +31,7 @@
 -1.0_O=C[C@@H](O)[C@H](O)[C@@H](O)CO,1.0_O,1.0_O=C[C@@H](O)/C=C(\O)CO
 -1.0_O=C[C@@H](O)/C=C(\O)CO,1.0_O=C[C@@H](O)CC(=O)CO
 -1.0_O=C[C@@H](O)CC(=O)CO,1.0_O=CCO,1.0_C=C(O)C=O
--1.0_CC(=O)C=O,1.0_CC(=O)C=O
+-1.0_CC(=O)C=O,1.0_C=C(O)C=O
 -1.0_O=C[C@@H](O)[C@H](O)[C@@H](O)CO,1.0_O,1.0_O=C/C=C(\O)[C@@H](O)CO
 -1.0_O=C/C=C(\O)[C@@H](O)CO,1.0_O=CCC(=O)[C@@H](O)CO
 -1.0_O=CCC(=O)[C@@H](O)CO,1.0_O=CCO,1.0_O=CCC=O

@@ -55,24 +55,12 @@ indices_to_species = dict(zip(species_indices.values(),
                           species_indices.keys()))
 
 
-# build the reactants and products list for each reaction
-reac_dict, prod_dict =\
-    ode_builder.build_reac_prod_dict(reactants_list,
-                                     products_list, species_indices)
-
-# build a dictionary where keys are the species
-# and values are the reactions with
-# stoichiometric ratios they are involvved in
-reac_species =\
-    ode_builder.build_reac_species_dict(reac_prod_list,
-                                        unique_species)
-
 # building forward rate constants
 temp = 573
 
 forward_rate_constants =\
     ode_builder.build_kmatrix_forward(file_rateconstantlist, temp)
-#print(forward_rate_constants)
+# print(forward_rate_constants)
 # building the free energy dictionary
 free_energy_dict = ode_builder.build_free_energy_dict(file_free_energy, temp)
 # Building reverse rate constants
@@ -89,15 +77,9 @@ reverse_rate_constants = \
     ode_builder.build_kmatrix_reverse(reac_prod_list, free_energy_dict,
                                       forward_rate_constants, temp)
 
-print(reverse_rate_constants)
-# building the forward and reverse rate equations for each reaction
-rates_f = ode_builder.build_rate_eqn(forward_rate_constants,
-                                     reac_dict, indices_to_species,
-                                     human='no', forward='yes')
-rates_r = ode_builder.build_rate_eqn(reverse_rate_constants,
-                                     prod_dict, indices_to_species,
-                                     human='no', forward='yes')
+# print(reverse_rate_constants)
+# building the odes for the entire mechanism
 
-dydt_list = ode_builder.build_dydt_list(rates_f, rates_r, unique_species,
-                                        reac_species, human='no')
+dydt_list = ode_builder.build_dydt_list(reac_prod_list, unique_species,
+                                        species_indices, rev_rate='yes')
 # print(dydt_list)

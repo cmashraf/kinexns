@@ -447,13 +447,39 @@ def build_rate(reac, spc_list, matrix, index, speciesindices):
 
 
 def build_stoic_matrix(complete_list, species_list, species_indices):
-    
+
     matrix = np.zeros((len(complete_list), len(species_list)), dtype=float)
     rate_final = []
     for rxnindex, reac_list in enumerate(complete_list):
         rate = build_rate(reac_list, species_list, matrix, rxnindex, species_indices)
         rate_final.append(rate)
     return matrix, rate_final
+
+
+def build_eqn_forward(matrix, reaction_rate, rev_rate):
+
+    if matrix > 0:
+        sign1 = ' + '
+        sign2 = ' - '
+    else:
+        sign1 = ' - '
+        sign2 = ' + '
+
+    if abs(matrix) == 1.0:
+        rate = sign1 + '%s' % re.split('-', reaction_rate)[0]
+        if rev_rate == 'yes':
+            rate += sign2 + '%s' % re.split('-', reaction_rate)[1]
+        else:
+            pass
+    else:
+        rate = sign1 + '%1.2f * %s' % (matrix, re.split('-', reaction_rate)[0])
+        if rev_rate == 'yes':
+            rate += sign2 + '%1.2f *%s' % (matrix, re.split('-', reaction_rate)[1])
+
+        else:
+            pass
+    # print(rate)
+    return rate
 
 
 def build_dydt_list(complete_list, species_list,
@@ -486,42 +512,9 @@ def build_dydt_list(complete_list, species_list,
         rate_equation = 'dy[%i]/dt = ' % (species_indices[species])
         i = species_indices[species]
         for j in range(len(rate_reac)):
-            if reac_matrix[j][i] > 0:
-                if reac_matrix[j][i] == 1.0:
-                    if rev_rate == 'yes':
-                        rate_equation += '+ %s' % (rate_reac[j])
-                    else:
-                        rate_equation += '+ %s' % (re.split('-', rate_reac[j])[0])
-                else:
-                    rate_equation += '+ %1.2f * %s' % \
-                                     (reac_matrix[j][i],
-                                      re.split('-', rate_reac[j])[0])
-                    if rev_rate == 'yes':
-                        rate_equation += '- %1.2f * %s' % \
-                                         (reac_matrix[j][i],
-                                          re.split('-', rate_reac[j])[1])
-                    else:
-                        pass
-            elif reac_matrix[j][i] < 0:
-                if reac_matrix[j][i] == -1.:
-                    rate_equation += '- %s' % (re.split('-', rate_reac[j])[0])
-                    if rev_rate == 'yes':
-                        rate_equation += '+ %s' % \
-                                         (re.split('-', rate_reac[j])[1])
-                    else:
-                        pass
-                else:
-                    rate_equation += '- %1.2f * %s' % \
-                                     (abs(reac_matrix[j][i]),
-                                      re.split('-', rate_reac[j])[0])
-                    if rev_rate == 'yes':
-                        rate_equation += '+ %1.2f * %s' % \
-                                         (abs(reac_matrix[j][i]),
-                                          re.split('-', rate_reac[j])[1])
-                    else:
-                        pass
-            else:
-                pass
+            if abs(reac_matrix[j][i]) > 0:
+                rate_equation += build_eqn_forward(reac_matrix[j][i],
+                                                   rate_reac[j], rev_rate)
         dydt_expressions.append(rate_equation)
 
     return dydt_expressions

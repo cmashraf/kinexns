@@ -121,7 +121,7 @@ class TestBuildKMatrixRev(unittest.TestCase):
     def test_correct_k_values_r(self):
         """Are the entries from build_k_matrix() what we expect?"""
         # kmatrix=build_kmatrix_forward(paths[1], 298)
-        self.assertEqual(kmatrix_r[0], 1.1379057686786213e-05)
-        self.assertEqual(kmatrix_r[1], 2.895704050369846e-08)
-        self.assertEqual(kmatrix_r[2], 9.975478106112853e-09)
-        self.assertEqual(kmatrix_r[3], 0.9483448135351068)
+        self.assertAlmostEqual(kmatrix_r[0], 1.1379057686786213e-05)
+        self.assertAlmostEqual(kmatrix_r[1], 2.895704050369846e-08)
+        self.assertAlmostEqual(kmatrix_r[2], 9.975478106112853e-09)
+        self.assertAlmostEqual(kmatrix_r[3], 0.0009483448135351068)

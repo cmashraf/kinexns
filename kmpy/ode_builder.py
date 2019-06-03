@@ -362,102 +362,121 @@ def build_kmatrix_reverse(complete_list, free_energy,
     return reverse_rates
 
 
-# def build_stoic_matrix(complete_list, species_list, species_indices):
-#     """
-#     builds the stoichiometric matrix for the entire mechanism and
-#     then builds the rate equations for each reaction.
-#     Parameters
-#     ----------
-#     complete_list    : list
-#                       A list of all the reactions with reactant and
-#                       product species and their stoichimetric coeffs
-#     species_list     : list
-#                      A list of unique species in the mechanism
-#     species_indices  : dict
-#                      the dictionary speciesindices
-#     Returns
-#     ----------
-#     matrix           : matrix
-#                      stoichiometric matrix for the entire
-#                      reaction mechanism
-#     rate_final       : str
-#                      list of strings of rate equations for each
-#                      reaction (both forward and reverse)
-#     """
-#     matrix = np.zeros((len(complete_list), len(species_list)), dtype=float)
-#     rate_final = []
-#     for rxnindex, reac_list in enumerate(complete_list):
-#         # rate = ''
-#         rate_f = 'kf[%s] ' % rxnindex
-#         rate_r = '- kr[%s]' % rxnindex
-#         concentration_f = ''
-#         concentration_r = ''
-#         for x in range(len(reac_list)):
-#             species = reac_list[x][1]
-#             for i in range(len(species_list)):
-#                 if i == species_indices[species]:
-#                     matrix[rxnindex][i] = float(reac_list[x][0])
-#                     if float(reac_list[x][0]) < 0:
-#                         if abs(float(reac_list[x][0])) == 1:
-#                             concentration_f += '* y[%s] ' % i
-#                         else:
-#                             concentration_f += '* y[%s] ** %s ' \
-#                                                % (i, abs(float
-#                                                          (reac_list[x][0])))
-#                     else:
-#                         if abs(float(reac_list[x][0])) == 1:
-#                             concentration_r += '* y[%s] ' % i
-#                         else:
-#                             concentration_r += '* y[%s] ** %s ' \
-#                                                % (i, float(reac_list[x][0]))
-#
-#         rate = rate_f + concentration_f + rate_r + concentration_r
-#         # print(rate)
-#         rate_final.append(rate)
-#     return matrix, rate_final
-
-def build_concentartion(counter, number):
+def build_concentartion(species_id, number):
+    """
+    Builds the concentration component for each species
+    Parameters
+    ----------
+    species_id      : int
+                     species id from the species_indices dictionary
+    number          : float
+                    stoichiometric co-eff of the species
+                    for specific reactions
+    Returns
+    ----------
+    concentration   : string
+                    the concentration component of that particular
+                    species
+    """
 
     if abs(float(number)) == 1:
-        concentration = '* y[%s] ' % counter
+        concentration = '* y[%s] ' % species_id
     else:
-        concentration = '* y[%s] ** %s ' % (counter, abs(float(number)))
+        concentration = '* y[%s] ** %s ' % (species_id, abs(float(number)))
 
     return concentration
 
 
-def build_rate(reac, spc_list, matrix, index, speciesindices):
+def build_rate(reac_prod, spc_list, matrix, index, indices_species):
+    """
+    Build the rate equation for each species
+    Parameters
+    ----------
+    reac_prod       : list
+                    list of the reactants and products
+                    with stoiciometric coeffs for each reaction
+    spc_list        : list
+                    A list of unique species in the mechanism
+    matrix          : matrix
+                    the stoichiometric matrix that is being built
+                    in build_stoic_matri function
+    index           : int
+                    index of the reaction
+    indices_species  : dict
+                     the dictionary species_indices
+    Returns
+    ----------
+    rate_reac       : str
+                    rate equation for individual reactions
+    """
     concentration_f = ''
     concentration_r = ''
     rate_f = 'kf[%s] ' % index
     rate_r = '- kr[%s]' % index
-    for x in range(len(reac)):
-        species = reac[x][1]
+    for x in range(len(reac_prod)):
+        species = reac_prod[x][1]
         for i in range(len(spc_list)):
-            if i == speciesindices[species]:
-                matrix[index][i] = float(reac[x][0])
-                if float(reac[x][0]) < 0:
-                    concentration_f += build_concentartion(i, reac[x][0])
+            if i == indices_species[species]:
+                matrix[index][i] = float(reac_prod[x][0])
+                if float(reac_prod[x][0]) < 0:
+                    concentration_f += build_concentartion(i, reac_prod[x][0])
                 else:
-                    concentration_r += build_concentartion(i, reac[x][0])
+                    concentration_r += build_concentartion(i, reac_prod[x][0])
 
     rate_reac = rate_f + concentration_f + rate_r + concentration_r
 
     return rate_reac
 
 
-def build_stoic_matrix(complete_list, species_list, species_indices):
+def build_stoic_matrix(complete_list, species_list, indices_species):
+    """
+    builds the stoichiometric matrix for the entire mechanism and
+    then builds the rate equations for each reaction.
+    Parameters
+    ----------
+    complete_list    : list
+                      A list of all the reactions with reactant and
+                      product species and their stoichimetric coeffs
+    species_list     : list
+                     A list of unique species in the mechanism
+    indices_species  : dict
+                     the dictionary species_indices
+    Returns
+    ----------
+    matrix           : matrix
+                     stoichiometric matrix for the entire
+                     reaction mechanism
+    rate_final       : str
+                     list of strings of rate equations for each
+                        reaction
+    """
 
     matrix = np.zeros((len(complete_list), len(species_list)), dtype=float)
     rate_final = []
     for rxnindex, reac_list in enumerate(complete_list):
-        rate = build_rate(reac_list, species_list, matrix, rxnindex, species_indices)
+        rate = build_rate(reac_list, species_list, matrix, rxnindex, indices_species)
         rate_final.append(rate)
     return matrix, rate_final
 
 
-def build_eqn_forward(matrix, reaction_rate, rev_rate):
+def build_reaction_eqn(matrix, reaction_rate, rev_rate):
+    """
+    Builds the ode for single reactions
+    matrix      : float
+                the stoichiometric coefficient of the element
+                for the specific reaction
+    reaction_rate   : string
+                    Reaction rate for the reaction calculated using
+                    build_stoich_matrix function
+    rev_rate         : 'yes' if reverse reactions are considered
+                       'No' if reverse reactions are NOT considered
+    Returns
+    ----------
+    rate        : string
+                The rate equation for a specific reaction
+                relative to a particular species
 
+    """
     if matrix > 0:
         sign1 = ' + '
         sign2 = ' - '
@@ -506,15 +525,19 @@ def build_dydt_list(complete_list, species_list,
     """
 
     reac_matrix, rate_reac = build_stoic_matrix(complete_list,
-                                                species_list, species_indices)
+                                                species_list,
+                                                species_indices)
     dydt_expressions = []
     for species in species_list:
         rate_equation = 'dy[%i]/dt = ' % (species_indices[species])
         i = species_indices[species]
         for j in range(len(rate_reac)):
             if abs(reac_matrix[j][i]) > 0:
-                rate_equation += build_eqn_forward(reac_matrix[j][i],
-                                                   rate_reac[j], rev_rate)
+                rate_equation += build_reaction_eqn(reac_matrix[j][i],
+                                                    rate_reac[j], rev_rate)
+            else:
+                pass
+
         dydt_expressions.append(rate_equation)
 
     return dydt_expressions

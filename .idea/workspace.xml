@@ -2,10 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/kmpy.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/reaction_class_new.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/reaction_class_new.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/ode_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/tests/data/free_energy_library.dat" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/tests/data/free_energy_library.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/tests/test_ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/tests/test_ode_builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/Untitled.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/data/complete_reaction_list.dat" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/data/complete_reaction_list.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/data/free_energy_library.dat" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/data/free_energy_library.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/data/reaction_list_test.dat-e" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmpy/run_kmpy.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/run_kmpy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,13 +26,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/kmpy/run_kmpy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="616">
-              <caret line="83" column="71" selection-start-line="83" selection-start-column="71" selection-end-line="83" selection-end-column="71" />
+            <state relative-caret-position="670">
+              <caret line="93" lean-forward="true" selection-start-line="93" selection-end-line="93" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/kmpy/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="54">
+              <caret line="2" column="62" selection-start-line="2" selection-start-column="62" selection-end-line="2" selection-end-column="62" />
               <folding>
-                <element signature="e#310#319#0" expanded="true" />
+                <element signature="e#0#64#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -30,8 +50,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kmpy/ode_builder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="364" selection-start-line="364" selection-end-line="364" />
+            <state relative-caret-position="160">
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -39,14 +59,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kmpy/tests/test_ode_builder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="586">
-              <caret line="123" column="67" selection-start-line="123" selection-start-column="67" selection-end-line="123" selection-end-column="67" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-2489">
+              <caret line="10" selection-start-line="10" selection-end-line="10" />
             </state>
           </provider>
         </entry>
@@ -59,16 +76,18 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/kmpy/run_kmpy.py" />
         <option value="$PROJECT_DIR$/kmpy/ode_builder.py" />
         <option value="$PROJECT_DIR$/kmpy/tests/test_ode_builder.py" />
+        <option value="$PROJECT_DIR$/kmpy/__init__.py" />
+        <option value="$PROJECT_DIR$/kmpy/ode_solver.py" />
+        <option value="$PROJECT_DIR$/kmpy/run_kmpy.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="310" />
     <option name="y" value="216" />
-    <option name="width" value="1400" />
+    <option name="width" value="1683" />
     <option name="height" value="1000" />
   </component>
   <component name="ProjectView">
@@ -93,20 +112,7 @@
               <item name="kmpy" type="b2602c69:ProjectViewProjectNode" />
               <item name="kmpy" type="462c0819:PsiDirectoryNode" />
               <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="kmpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
-              <item name="test_ode_builder.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="kmpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="ode_builder.py" type="8704e2dd:PyFileNode" />
+              <item name="ode_solver.py" type="8704e2dd:PyFileNode" />
             </path>
           </expand>
           <select />
@@ -276,10 +282,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="310" y="216" width="1400" height="1000" extended-state="0" />
+    <frame x="310" y="216" width="1683" height="1000" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24873096" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20637786" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -297,6 +303,25 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20637786" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3293944" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39910313" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.3295964" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32847533" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.3295964" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.3295964" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout-to-restore>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="rate equations are generated using stoichimetric matrix" />
@@ -317,33 +342,53 @@
     <entry file="file://$PROJECT_DIR$/kmpy/tests/data/free_energy_library.dat">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/kmpy/run_kmpy.py">
+    <entry file="file://$PROJECT_DIR$/kmpy/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="616">
-          <caret line="83" column="71" selection-start-line="83" selection-start-column="71" selection-end-line="83" selection-end-column="71" />
+        <state relative-caret-position="54">
+          <caret line="2" column="62" selection-start-line="2" selection-start-column="62" selection-end-line="2" selection-end-column="62" />
           <folding>
-            <element signature="e#310#319#0" expanded="true" />
+            <element signature="e#0#64#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/kmpy/read_enthalpies.ipynb">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kmpy/reaction_class.ipynb">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/kmpy/ode_builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="364" selection-start-line="364" selection-end-line="364" />
+        <state relative-caret-position="160">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/kmpy/ode_solver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="39" column="7" selection-start-line="39" selection-start-column="7" selection-end-line="39" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/kmpy/tests/test_ode_builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="586">
-          <caret line="123" column="67" selection-start-line="123" selection-start-column="67" selection-end-line="123" selection-end-column="67" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-2489">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kmpy/run_kmpy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="670">
+          <caret line="93" lean-forward="true" selection-start-line="93" selection-end-line="93" />
         </state>
       </provider>
     </entry>

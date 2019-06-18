@@ -5,12 +5,17 @@ details see the journal article linked in the README at
 https://github.com/houghb/ligpy.
 Please read the documentation for instructions on using this module.
 """
-
-import os
+import io
 # import time
 import sys
-from .ode_builder import *
-from .ode_solver import *
+import timeit
+# from .ode_builder import *
+# from .ode_solver import *
+from .sensitivity_analysis import *
+from .parallel_solver import *
+import matplotlib.pyplot as plt
+from rdkit.Chem import Descriptors
+from rdkit import Chem
 
 # import numpy as np
 # from .constants import GAS_CONST, PR_ATM
@@ -61,7 +66,7 @@ dydt_list = build_dydt_list(reac_prod_list, unique_species,
                             species_indices, rev_rate='yes')
 
 # building forward rate constants
-temp = 573
+temp = 773
 
 forward_rate_constants =\
     build_kmatrix_forward(file_rateconstantlist, temp)
@@ -82,12 +87,54 @@ reverse_rate_constants = \
     build_kmatrix_reverse(reac_prod_list, free_energy_dict,
                           forward_rate_constants, temp)
 
+text_trap = io.StringIO()
+sys.stdout = text_trap
+
+sys.stdout = sys.__stdout__
 # getting the initial conditions setup
 initial_conc = initial_condition(unique_species, species_indices,
-                                 ['O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O'], [1])
+                                 ['O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O'], [1.0])
 
 # Solving the system of ODEs
 mod, sim = stiff_ode_solver(unique_species, dydt_list, initial_conc,
                             forward_rate_constants, reverse_rate_constants)
 
-print(mod)
+wt_xylose = Descriptors.MolWt(Chem.MolFromSmiles('O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O')) * initial_conc[species_indices['O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O']]
+
+
+plt.plot(mod, sim[:,species_indices['O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O']] * 100/initial_conc[species_indices['O[C@H]1[C@H](O)CO[C@@H](O)[C@@H]1O']], color="b" , label = 'xylose')
+plt.plot(mod, sim[:,species_indices['O=CCO']] * 100 * Descriptors.MolWt(Chem.MolFromSmiles('O=CCO')) / wt_xylose, color="r" , label = 'Glycolaldehyde')
+plt.plot(mod, sim[:,species_indices['O=Cc1ccco1']] * 100 * Descriptors.MolWt(Chem.MolFromSmiles('O=Cc1ccco1')) / wt_xylose, color="g", label = 'Furfural')
+# #P.xscale(10e-10)
+
+plt.ylim(0, 100)
+plt.legend()
+plt.xlabel('Time(s)')
+plt.ylabel('Wt (%)')
+plt.show()
+#plt.yscale('log')
+
+# Generating parameters for Sensitivity analysis
+sa_path = '/Users/chowdhury/Documents/kmpy_results/SA_data/'
+gen_params(2, sa_path, 'params.txt', 'param_set.txt')
+
+setpath = '/Users/chowdhury/Documents/kmpy_results/SA_data/test/'
+file_path_read = setpath + 'param_set.txt'
+file_path_write = setpath + 'model_solutions.txt'
+file_input = setpath + 'params.txt'
+
+# benchmarks = list([])
+#
+# benchmarks.append(timeit.Timer('serial(file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list)',
+#             'from __main__ import serial, file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list').timeit(number=1))
+#
+# benchmarks.append(timeit.Timer('multiprocess(2, file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list)',
+#             'from __main__ import multiprocess, file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list').timeit(number=1))
+#
+# benchmarks.append(timeit.Timer('multiprocess(3, file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list)',
+#             'from __main__ import multiprocess, file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list').timeit(number=1))
+#
+# benchmarks.append(timeit.Timer('multiprocess(4, file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list)',
+#             'from __main__ import multiprocess, file_path_read, forward_rate_constants, file_rateconstantlist, file_free_energy, reac_prod_list, unique_species, initial_conc, dydt_list').timeit(number=1))
+#
+# print(benchmarks)

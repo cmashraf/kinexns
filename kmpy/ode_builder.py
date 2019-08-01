@@ -17,8 +17,8 @@ def set_paths(my_path):
                             path to the file `complete_reactionlist.dat`
     rateconstantlist_path : str
                             path to the file `complete_rateconstantlist.dat`
-    compositionlist_path  : str
-                            path to the file `compositionlist.dat`
+    free_energy_path    : str
+                            path to the file 'free_energy_library.dat'
     """
 
     reactionlist_path = my_path + '/data/complete_reaction_list.dat'

@@ -112,7 +112,7 @@ plt.legend()
 plt.xlabel('Time(s)')
 plt.ylabel('Wt (%)')
 plt.show()
-#plt.yscale('log')
+# plt.yscale('log')
 
 # Generating parameters for Sensitivity analysis
 sa_path = '/Users/chowdhury/Documents/kmpy_results/SA_data/'

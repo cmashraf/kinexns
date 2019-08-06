@@ -2,23 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/kmpy.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/Batch_reactor.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/Batch_reactor.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/file_path_write" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/reaction_class_new.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/reaction_class_new.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/setpath" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/kmpy/ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/ode_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/ode_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/ode_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/parallel_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/parallel_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/run_kmpy.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/run_kmpy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kmpy/sensitivity_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmpy/sensitivity_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,10 +25,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kmpy/parallel_solver.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1512">
+            <state relative-caret-position="770">
               <caret line="56" selection-start-line="56" selection-end-line="56" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
@@ -55,7 +40,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kmpy/ode_solver.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="589">
+            <state relative-caret-position="2592">
               <caret line="98" column="35" selection-start-line="98" selection-start-column="35" selection-end-line="98" selection-end-column="35" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
@@ -97,11 +82,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/kmpy/ode_builder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="320" column="4" selection-start-line="320" selection-start-column="4" selection-end-line="320" selection-end-column="4" />
+            <state relative-caret-position="349">
+              <caret line="457" lean-forward="true" selection-start-line="457" selection-end-line="457" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -131,9 +116,9 @@
         <option value="$PROJECT_DIR$/kmpy/run_kmpy.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/kmpy/sensitivity_analysis.py" />
-        <option value="$PROJECT_DIR$/kmpy/ode_builder.py" />
         <option value="$PROJECT_DIR$/kmpy/ode_solver.py" />
         <option value="$PROJECT_DIR$/kmpy/parallel_solver.py" />
+        <option value="$PROJECT_DIR$/kmpy/ode_builder.py" />
       </list>
     </option>
   </component>
@@ -166,20 +151,6 @@
               <item name="kmpy" type="462c0819:PsiDirectoryNode" />
               <item name="kmpy" type="462c0819:PsiDirectoryNode" />
               <item name="ode_builder.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="kmpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="ode_builder.py" type="8704e2dd:PyFileNode" />
-              <item name="KineticParams" type="dd8bbb05:PyElementNode" />
-            </path>
-            <path>
-              <item name="kmpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="kmpy" type="462c0819:PsiDirectoryNode" />
-              <item name="ode_builder.py" type="8704e2dd:PyFileNode" />
-              <item name="Reaction" type="dd8bbb05:PyElementNode" />
             </path>
             <path>
               <item name="kmpy" type="b2602c69:ProjectViewProjectNode" />
@@ -368,9 +339,10 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="87" y="161" width="1683" height="1000" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49887893" visible="true" weight="0.20637786" />
-      <window_info id="Structure" order="1" sideWeight="0.5011211" side_tool="true" weight="0.20637786" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49775785" visible="true" weight="0.20637786" />
+      <window_info id="Structure" order="1" sideWeight="0.50224215" side_tool="true" weight="0.20637786" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -442,6 +414,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/kmpy/ode_solver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2592">
+          <caret line="98" column="35" selection-start-line="98" selection-start-column="35" selection-end-line="98" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/kmpy/sensitivity_analysis.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="8829">
@@ -476,32 +458,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/kmpy/ode_solver.py">
+    <entry file="file://$PROJECT_DIR$/kmpy/parallel_solver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="589">
-          <caret line="98" column="35" selection-start-line="98" selection-start-column="35" selection-end-line="98" selection-end-column="35" />
+        <state relative-caret-position="770">
+          <caret line="56" selection-start-line="56" selection-end-line="56" />
           <folding>
-            <element signature="e#0#34#0" expanded="true" />
+            <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/kmpy/ode_builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="320" column="4" selection-start-line="320" selection-start-column="4" selection-end-line="320" selection-end-column="4" />
+        <state relative-caret-position="349">
+          <caret line="457" lean-forward="true" selection-start-line="457" selection-end-line="457" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/kmpy/parallel_solver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1512">
-          <caret line="56" selection-start-line="56" selection-end-line="56" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>

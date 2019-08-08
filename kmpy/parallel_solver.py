@@ -43,12 +43,12 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     values = list(map(float, data.split()))
     kf_random[:] = np.array(values[:len(forward_rate)])
     temp = values[-1] + 273
-    kf_actual = np.array(build_kmatrix_forward(file_rateconstant, temp))
+    kf_actual = np.array(build_forward_rates(file_rateconstant, temp))
     kf_pur = np.array([actual * 10 ** rand for actual,
                       rand in zip(kf_actual, kf_random)])
-    kf_purturbed = kf_pur.tolist()
+    kf_purturbed = list(kf_pur)
     free_energy_dict = build_free_energy_dict(file_energy, temp)
-    kr_purturbed = build_kmatrix_reverse(complete_list, free_energy_dict, kf_purturbed, temp)
+    kr_purturbed = build_reverse_rates(complete_list, free_energy_dict, kf_purturbed, temp)
     mod, sim = stiff_ode_solver(species_list, dydtlist, initial_y,
                                 kf_purturbed, kr_purturbed, t_final)
 
@@ -164,4 +164,4 @@ def write_model_sol(file_name, res):
         pass
 
     dataframe = pd.DataFrame.from_records(res)
-    dataframe.to_csv(file, sep='\t', header=None, index=None)
+    dataframe.to_csv(file_name, sep='\t', header=None, index=None)

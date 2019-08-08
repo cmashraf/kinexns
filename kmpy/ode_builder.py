@@ -1,6 +1,6 @@
 import numpy as np
 from .constants import GAS_CONST, PR_ATM
-from .constants import KCAL_JL, HT_JL
+from .constants import KCAL_JL, HT_JL, CAL_JL
 import math
 import pandas as pd
 import re
@@ -225,6 +225,190 @@ def generate_thermo_dict(file_path, smiles, temp):
     return dict_thermo_values
 
 
+def species_string(string_lists, smiles, reactant=True):
+    """
+    This function generates the reactant and the product strings that
+    to write in the reaction file from the chemkin reaction file to make
+    the reaction strings compatible for this package.
+    Parameters
+    -------
+    string_lists        : list of strings
+                        the reactants and products list parsed from
+                        chemkin reaction file
+    smiles              : dict
+                        smiles dictionary of all the molecules
+    reactant            : bool
+                        indictaes if the list is a reactant or product list
+                        default = True indicates reactant list
+    Returns
+    -------
+    formatted_string    : str
+                        species smiles and stoichiometric coeff formatted
+                        in proper way to be written in the file
+                        format: coeff_smiles
+    """
+
+    formatted_string = []
+    for i in range(len(string_lists)):
+        #        print(s_prod)
+
+        if ' ' in string_lists[i]:
+            stoic = string_lists[i].split()[0]
+            species = smiles[string_lists[i].split()[1]]
+            # print(species)
+        else:
+            stoic = '1.0'
+            species = smiles[string_lists[i]]
+            # print(species)
+
+        if reactant:
+            stoic_val = -1 * float(stoic)
+            stoic = str(stoic_val)
+        formatted_string.append(stoic + '_' + species)
+
+    formatted_string = ','.join(formatted_string)
+    return formatted_string
+
+
+def write_reactions(string, smiles, file_reaction, file_rate_cons):
+    """
+    This function gets a reaction line from chemkin reaction file,
+    and then formats it to be written in a format that could be recognised
+    by the package.
+    Parameters
+    -------
+    string          : str
+                    line that has been identified as a reaction line from
+                    chemkin reaction file.
+    smiles          : dict
+                    smiles dictionary of all the molecules
+    file_reaction   : textIO
+                    opened file name or path where the reactions
+                    will be written
+    file_rate_cons       :textIO
+                    opened file name or path where the reaction rates
+                    will be written
+    Returns
+    -------
+    """
+    s = string.split('<=>')
+    s2 = s[1].split()
+    s_reac = s[0].split('+')
+    s_pr = ' '.join(s2[:-3])
+    #            print(s_pr)
+    s_prod = s_pr.split('+')
+    #            print(s_prod)
+    reac_string = species_string(s_reac, smiles)
+    prod_string = species_string(s_prod, smiles, reactant=False)
+
+    reaction_string = reac_string + ',' + prod_string
+    #    print(reaction_string)
+    file_reaction.write(reaction_string + '\n')
+    file_rate_cons.write(s2[-3] + ' ' + s2[-2] + ' ' + s2[-1] + '\n')
+
+
+def parse_chemkin_reaction(file_name, smiles, file_reac, file_rate):
+    """
+    This function parsse the chemkin reaction mechanism file with the
+    help of two other functions (write_reactions and species_string and
+    writes two seperate files with reactions and associated rate constants
+    that will be recognised by this package.
+    Parameters
+    -------
+    file_name       : str
+                    name or path of the chemkin reaction mechanism file
+    smiles          : dict
+                    smiles dictionary of all the molecules
+    file_reac       : str
+                    file name or path where the reactions will be written
+    file_rate       : str
+                    file name or path where the reaction rates
+                    will be written
+    Returns
+    -------
+    three_body_reactions    : list
+                            A list of rection numbers those have third body effects
+    three_body_eff          : list of dictionaries
+                            each list contains a dictionary with simes as
+                            keys and third body efficiencies as values
+                            for the species those have a tbe other than
+                            one corresponding to the reaction numbers in
+                            third_body_reactions
+    pr_dependent            : lists of lists
+                            three seperate lists
+                            first list is a list of reaction numbers
+                            those have pressure depedence
+                            second list is a list of lists where each
+                            sublist contains Arrhenius parameters to
+                            calculate k0 values for the reaction
+                            number in the first list
+                            third list is a list of lists where each
+                            sublist contains Troe parameters to calculate
+                            troe function values for the
+                            reaction number in the first list
+    """
+
+    file = open(file_name, 'r')
+    file_reactions = open(file_reac, 'w+')
+    file_rate_constants = open(file_rate, 'w+')
+    i = 0
+    three_body_reactions = []
+    pr_dependent_reactions = []
+    k_low = []
+    troe_value = []
+    three_body_eff = []
+    low_count = 0
+    troe_count = 0
+    for line in file:
+        #        print(line)
+
+        if '+M' in line:
+            line = re.sub(r'\+M', '', line)
+            three_body_reactions.append(i)
+
+        if '()' in line:
+            line = re.sub(r'[()]', '', line)
+            pr_dependent_reactions.append(i)
+        if any(item in line for item in ['/', 'LOW', 'TROE']):
+            if 'LOW' in line:
+                low_count = low_count + 1
+                s = line.split()
+                k_low.append([float(s[2]), float(s[3]), float(s[4])])
+            elif 'TROE' in line:
+                troe_count = troe_count + 1
+                if troe_count != low_count:
+                    troe_value.append([0])
+                    troe_count = troe_count + 1
+                s = line.split()
+                if len(s) == 6:
+                    troe_value.append([float(s[1]), float(s[2]),
+                                       float(s[3]), float(s[4])])
+                else:
+                    troe_value.append([float(s[1]), float(s[2]),
+                                       float(s[3]), 1e10])
+            else:
+                s = line.split()
+                keys = [s[i].split('/')[0] for i in range(len(s))]
+                keys_smi = [smiles[key] for key in keys]
+                values = [s[i].split('/')[1] for i in range(len(s))]
+
+                dictionary = dict(zip(keys_smi, values))
+                #                dictList.append()
+                three_body_eff.append(dictionary)
+
+        if '=' in line:
+            write_reactions(line, smiles, file_reactions, file_rate_constants)
+            i = i + 1
+
+    pr_dependent = [pr_dependent_reactions, k_low, troe_value]
+
+    file_reactions.close()
+    file_rate_constants.close()
+
+    #    print(three_body_eff)
+    return three_body_reactions, three_body_eff, pr_dependent
+
+
 class Reaction(object):
 
     """
@@ -350,6 +534,86 @@ def build_species_list(reaction_file):
     return reactant_list, product_list, species_list
 
 
+def update_eff_dict(chemkin_data, species_list):
+    """
+    This function updates the third body efficiency dict generated
+    by parsing chemkin reaction mechanism file. Since not all the
+    species present in the efficienct dictionary might not be present
+    in the mechanism, this function goes through the entire dictionary
+    and deletes the species not present in mechanism
+    Parameters
+    ____________
+    chemkin_data        : list of lists
+                        the output generated from parse_chemkin_reaction
+                        function
+    species_list        : list
+                        a list of unique species in the mechanism
+    Returns
+    ____________
+   updated_eff_dictlist : list of dictionaries
+                        a list of dictionaries with the species present in
+                        the mechanism only
+    """
+    updated_eff_dictlist = []
+    dictlist = chemkin_data[2]
+    for i in range(len(dictlist)):
+        keys = list(dictlist[i].keys())
+        keys = [item for item in keys if item in species_list]
+        values = [dictlist[i][k] for k in keys]
+        updated_eff_dict = dict(zip(keys, values))
+        updated_eff_dictlist.append(updated_eff_dict)
+    return updated_eff_dictlist
+
+
+def build_third_body_mat(chemkin_data, complete_list, species_list):
+    """
+    builds a 2D array like stoichiometric matrix where the number of
+    row is equal to number of reactions and number of columns is equal
+    to number of species. Each entry of the matrix corresponds the
+    third body efficiency of that species in the reaction number
+    corresponding to the row number
+    Parameters
+    ____________
+    chemkin_data        : list of lists
+                        the output generated from parse_chemkin_reaction
+                        function
+    complete_list       : list
+                        A list of all the reactions with reactant and
+                        product species and their stoichimetric coeffs
+    species_list        : list
+                        a list of unique species in the mechanism
+    Retruns
+    ____________
+   third_body           : array
+                         a 2D numpy array with third body efficiencies
+    """
+    eff_dict = update_eff_dict(chemkin_data, species_list)
+    third_body = np.zeros((len(complete_list), len(species_list)), dtype=float)
+    reaction_numbers = chemkin_data[0]
+    print(eff_dict[20])
+    el_numbers = []
+    values = []
+    for i, j in zip(range(len(eff_dict)), reaction_numbers):
+        keys_list = list(eff_dict[i].keys())
+        keys_list.sort()
+        el_numbers.append([(j, species_list.index(k)) for k in keys_list])
+        values.append(list(eff_dict[i].values()))
+    #     #third_body_matrix[1][1]
+    for row in reaction_numbers:
+        third_body[row, :] = 1
+
+    #    arr_el_numbers = np.array(el_numbers).reshape(-1, 2)
+    arr_el_numbers = [x for sublist in el_numbers for x in sublist]
+    arr_values = [x for sublist in values for x in sublist]
+    print(arr_el_numbers)
+
+    for (i, j), val in zip(arr_el_numbers, arr_values):
+        #        print(val)
+        third_body[i, j] = val
+
+    return third_body
+
+
 class KineticParams(object):
     """
     This is the kinetic params class, they read the rates constant file,
@@ -386,7 +650,7 @@ class KineticParams(object):
     def get_forward_rate_constants(self, parameters, temp):
         """
         Generating the forward rate constants for each reaction
-        Parameters
+        Parameters:
         ____________
         parameters          : list
                             A list of Arrhenius paramters
@@ -403,14 +667,71 @@ class KineticParams(object):
         return self.forward_rates
 
 
-def build_kmatrix_forward(rateconstantlist, temp):
-
+def build_forward_rates(rateconstantlist, temp):
+    """
+    This function builds the forward rate values for all
+    the reactions. The Arrhenius rate parameters are found
+    in the rateconstantlist file.
+    Parameters
+    ----------
+    rateconstantlist        : str
+                            path or name of the file to read from
+    temp                    : float
+                            temperature
+    Returns
+    ----------
+    rate_constants      : list
+                        a list of forward rate constants for all
+                        the reactions
+    """
     rate_constants = []
     for line in open(rateconstantlist, 'r').readlines():
         f_params = KineticParams()
         params = f_params.get_forward_rate_parameters(line)
         rate_constants.append(f_params.get_forward_rate_constants(params, temp))
 
+    return rate_constants
+
+
+def update_rate_constants_for_pressure(chemkin_data, rate_constants, temp):
+    """
+    This function updates the forward rate coefficents of the pressure
+    dependent reactions. It uses Troe formula to update the rate constants
+    of the fall off reactions.
+    Parameters
+    ____________
+    chemkin_data        : list of lists
+                        the output generated from parse_chemkin_reaction
+                        function
+    rate_constants      : list
+                        forward rate constants
+    temp                    : float
+                            temperature
+    Returns
+    ----------
+    rate_constants      : list
+                        a list of updated forward rate constants for all
+                        the reactions
+    """
+    reaction_numbers = chemkin_data[1][0]
+    rate_params = chemkin_data[1][1]
+    troe_params = np.asarray(chemkin_data[1][2])
+
+    for i, num in enumerate(reaction_numbers):
+        k_0 = rate_constants[i]
+        k_inf = rate_params[i][0] * temp ** rate_params[i][1] * \
+            np.exp(- rate_params[i][2] * CAL_JL / (GAS_CONST * temp))
+        p_r = k_0 / k_inf
+        if len(troe_params[i]) == 1:
+            troe_value = 1
+        else:
+            if troe_params[i][2] == 0:
+                troe_params[i][2] = 1e-30
+            troe_value = (1 - troe_params[i][0]) * \
+                np.exp(- temp / troe_params[i][1]) + troe_params[i][0] *\
+                np.exp(- temp / troe_params[i][2]) + \
+                np.exp(- troe_params[i][3] / temp)
+        rate_constants[num] = k_inf * (p_r / (1 + p_r)) * troe_value
     return rate_constants
 
 
@@ -533,8 +854,8 @@ def build_free_energy_change(free_energy, species_list, stoic_mat, factor, chemk
     return gibbs_energy_list, mol_change
 
 
-def build_kmatrix_reverse(free_energy, species_list, stoic_mat,
-                          factor, forward_rates, temp, chemkin=True):
+def build_reverse_rates(free_energy, species_list, stoic_mat,
+                       factor, forward_rates, temp, chemkin=True):
     """"
     Calculates the reverse rate constants for all the reactions
     using the free energy change through the following steps

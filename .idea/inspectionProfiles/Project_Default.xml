@@ -25,6 +25,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="Returns" />
+          <option value="str.write" />
         </list>
       </option>
     </inspection_tool>

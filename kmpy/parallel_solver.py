@@ -6,7 +6,8 @@ import os
 
 
 def func_solv(data, forward_rate, file_rateconstant, file_energy,
-              complete_list, species_list, initial_y, dydtlist, t_final):
+              matrix, species_list, initial_y, t_final, factor,
+              smiles=None, chemkin=True):
     """
     Solves the system of ODEs for different rate constants
     generated from the data file
@@ -15,6 +16,8 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     data             : str
                     Each line of the data files where various randomly chosen
                     parameter values are listed to perform sensitivity analysis
+    matrix          : ndarray
+                    stoichiometric matrix
     forward_rate   : list
                     A list of forward reaction rates
                     for all the reactions in the mechanism
@@ -22,17 +25,20 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
                       path to the file `complete_rateconstantlist.dat`
     file_energy     : str
                     path to the file 'free_energy_library.dat'
-    complete_list   : list
-                     A list of all the reactions with reactant and
-                      product species and their stoichimetric coeffs
     species_list     : list
                      A list of unique species in the mechanism
     initial_y       : list
                     A list of initial concentrations
-    dydtlist        : list
-                    the list of ODEs
-    t_final         : float
+    smiles             : dict
+                    the smiles dictionary generated from
+                    species_smiles.dat file
+    t_final        : float
                     final time in seconds
+    factor              : float
+                        conversion factor from given unit of energy to kJ
+    chemkin             : bool
+                        indicates if chemkin files are read as input files
+                        default = True
     Returns
     ----------
     sim[-1]         : list
@@ -47,17 +53,22 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     kf_pur = np.array([actual * 10 ** rand for actual,
                       rand in zip(kf_actual, kf_random)])
     kf_purturbed = list(kf_pur)
-    free_energy_dict = build_free_energy_dict(file_energy, temp)
-    kr_purturbed = build_reverse_rates(complete_list, free_energy_dict, kf_purturbed, temp)
-    mod, sim = stiff_ode_solver(species_list, dydtlist, initial_y,
-                                kf_purturbed, kr_purturbed, t_final)
+    if chemkin:
+        free_energy_dict = generate_thermo_dict(file_energy, smiles, temp)
+    else:
+        free_energy_dict = build_free_energy_dict(file_energy, temp)
+    kr_purturbed = build_reverse_rates(free_energy_dict, species_list, matrix,
+                                       factor, kf_purturbed, temp, chemkin)
+    mod, sim = stiff_ode_solver(species_list, matrix, initial_y, kf_purturbed,
+                                kr_purturbed, third_body=None,
+                                sim_time=t_final)
 
     return sim[-1]
 
 
 def serial(file_read, forward_rate, file_rateconstant, file_energy,
-           complete_list, species_list,
-           initial_y,  dydtlist, t_final):
+           matrix, species_list, factor,
+           initial_y, t_final, smiles=None, chemkin=True):
     """
     Iteratively solves the system of ODEs for different rate constants
     generated from the data file in serial
@@ -73,17 +84,22 @@ def serial(file_read, forward_rate, file_rateconstant, file_energy,
                       path to the file `complete_rateconstantlist.dat`
     file_energy     : str
                     path to the file 'free_energy_library.dat'
-    complete_list   : list
-                     A list of all the reactions with reactant and
-                      product species and their stoichimetric coeffs
+    matrix          : ndarray
+                    stoichiometric matrix
     species_list     : list
                      A list of unique species in the mechanism
     initial_y       : list
                     A list of initial concentrations
-    dydtlist        : list
-                    the list of ODEs
     t_final         : float
                     final time in seconds
+    smiles             : dict
+                    the smiles dictionary generated from
+                    species_smiles.dat file
+    factor              : float
+                        conversion factor from given unit of energy to kJ
+    chemkin             : bool
+                        indicates if chemkin files are read as input files
+                        default = True
     Returns
     ----------
                      : list
@@ -93,13 +109,13 @@ def serial(file_read, forward_rate, file_rateconstant, file_energy,
     """
     read_file = open(file_read, "r")
     return [func_solv(data, forward_rate, file_rateconstant, file_energy,
-                      complete_list, species_list,
-                      initial_y, dydtlist, t_final) for data in read_file]
+                      matrix, species_list, initial_y, t_final, factor,
+                      smiles=smiles, chemkin=chemkin) for data in read_file]
 
 
 def multiprocess(processes, file_read, forward_rate, file_rateconstant,
-                 file_energy, complete_list,
-                 species_list, initial_y, dydtlist, t_final):
+                 file_energy, matrix, species_list, factor,
+                 initial_y, t_final, smiles=None, chemkin=True):
 
     """
     Iteratively solves the system of ODEs for different rate constants
@@ -116,19 +132,24 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
                     for all the reactions in the mechanism
     file_rateconstant : str
                       path to the file `complete_rateconstantlist.dat`
+    matrix          : ndarray
+                    stoichiometric matrix
     file_energy     : str
                     path to the file 'free_energy_library.dat'
-    complete_list   : list
-                     A list of all the reactions with reactant and
-                      product species and their stoichimetric coeffs
     species_list     : list
                      A list of unique species in the mechanism
     initial_y       : list
                     A list of initial concentrations
-    dydtlist        : list
-                    the list of ODEs
     t_final         : float
                     final time in seconds
+    smiles             : dict
+                    the smiles dictionary generated from
+                    species_smiles.dat file
+    factor              : float
+                        conversion factor from given unit of energy to kJ
+    chemkin             : bool
+                        indicates if chemkin files are read as input files
+                        default = True
     Returns
     ----------
     results         : list
@@ -140,8 +161,8 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
     pool = mp.Pool(processes=processes)
     results = [pool.apply_async(func_solv, args=(
                data, forward_rate, file_rateconstant, file_energy,
-               complete_list, species_list, initial_y,
-               dydtlist, t_final)) for data in read_file]
+               matrix, species_list, initial_y, t_final, factor,
+               smiles, chemkin)) for data in read_file]
     results = [p.get() for p in results]
     results.sort()  # to sort the results by input window width
     return results

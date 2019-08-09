@@ -32,7 +32,7 @@ def initial_condition(species_list, indices_species, species_smile, concentratio
 
 
 def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
-                     rev_rate, third_body=None, has_tbe=True,
+                     rev_rate, third_body=None,
                      iteration='Newton', discr='BDF',
                      atol=1e-10, rtol=1e-7,
                      sim_time=0.001, num_data_points=500):
@@ -56,9 +56,6 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
                     total time to simulate in seconds
     third_body      : ndarray
                     third body matrix, default = None
-    has_tbe         : bool
-                    If the mechanism contains three body efficiency,
-                    default=True
     iteration       : str
                     determines the iteration method that is be
                     used by the solver, default='Newton'
@@ -101,7 +98,7 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
         #        print(t)
 
         y = concentration
-        if has_tbe:
+        if third_body is not None:
             third_body_eff = np.dot(third_body, y)
             third_body_eff = np.where(third_body_eff > 0,
                                       third_body_eff, 1)

@@ -7,7 +7,7 @@ import os
 
 def func_solv(data, forward_rate, file_rateconstant, file_energy,
               matrix, species_list, initial_y, t_final, factor,
-              smiles=None, chemkin=True):
+              third_body, smiles=None, chemkin=True):
     """
     Solves the system of ODEs for different rate constants
     generated from the data file
@@ -60,7 +60,7 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     kr_purturbed = build_reverse_rates(free_energy_dict, species_list, matrix,
                                        factor, kf_purturbed, temp, chemkin)
     mod, sim = stiff_ode_solver(species_list, matrix, initial_y, kf_purturbed,
-                                kr_purturbed, third_body=None,
+                                kr_purturbed, third_body=third_body,
                                 sim_time=t_final)
 
     return sim[-1]
@@ -68,7 +68,7 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
 
 def serial(file_read, forward_rate, file_rateconstant, file_energy,
            matrix, species_list, factor,
-           initial_y, t_final, smiles=None, chemkin=True):
+           initial_y, t_final, third_body=None, smiles=None, chemkin=True):
     """
     Iteratively solves the system of ODEs for different rate constants
     generated from the data file in serial
@@ -110,12 +110,13 @@ def serial(file_read, forward_rate, file_rateconstant, file_energy,
     read_file = open(file_read, "r")
     return [func_solv(data, forward_rate, file_rateconstant, file_energy,
                       matrix, species_list, initial_y, t_final, factor,
-                      smiles=smiles, chemkin=chemkin) for data in read_file]
+                      third_body=third_body, smiles=smiles, chemkin=chemkin)
+            for data in read_file]
 
 
 def multiprocess(processes, file_read, forward_rate, file_rateconstant,
                  file_energy, matrix, species_list, factor,
-                 initial_y, t_final, smiles=None, chemkin=True):
+                 initial_y, t_final, third_body=None, smiles=None, chemkin=True):
 
     """
     Iteratively solves the system of ODEs for different rate constants
@@ -162,7 +163,7 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
     results = [pool.apply_async(func_solv, args=(
                data, forward_rate, file_rateconstant, file_energy,
                matrix, species_list, initial_y, t_final, factor,
-               smiles, chemkin)) for data in read_file]
+               third_body, smiles, chemkin)) for data in read_file]
     results = [p.get() for p in results]
     results.sort()  # to sort the results by input window width
     return results

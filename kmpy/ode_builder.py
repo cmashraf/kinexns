@@ -52,7 +52,7 @@ def set_paths_chemkin_files(my_path):
 
     thermo_path = my_path + '/thermo.dat'
     smile_path = my_path + '/species_smiles.dat'
-    reactionlist_path = my_path + 'reaction.dat'
+    reactionlist_path = my_path + '/reaction.dat'
     return thermo_path, smile_path, reactionlist_path
 
 
@@ -309,7 +309,7 @@ def write_reactions(string, smiles, file_reaction, file_rate_cons):
 
 def parse_chemkin_reaction(file_name, smiles, file_reac, file_rate):
     """
-    This function parsse the chemkin reaction mechanism file with the
+    This function parse the chemkin reaction mechanism file with the
     help of two other functions (write_reactions and species_string and
     writes two seperate files with reactions and associated rate constants
     that will be recognised by this package.
@@ -543,7 +543,7 @@ def update_eff_dict(chemkin_data, species_list):
     and deletes the species not present in mechanism
     Parameters
     ____________
-    chemkin_data        : list of lists
+    chemkin_data        :
                         the output generated from parse_chemkin_reaction
                         function
     species_list        : list
@@ -555,7 +555,7 @@ def update_eff_dict(chemkin_data, species_list):
                         the mechanism only
     """
     updated_eff_dictlist = []
-    dictlist = chemkin_data[2]
+    dictlist = chemkin_data[1]
     for i in range(len(dictlist)):
         keys = list(dictlist[i].keys())
         keys = [item for item in keys if item in species_list]
@@ -584,13 +584,13 @@ def build_third_body_mat(chemkin_data, complete_list, species_list):
                         a list of unique species in the mechanism
     Retruns
     ____________
-   third_body           : array
+    third_body           : array
                          a 2D numpy array with third body efficiencies
     """
+
     eff_dict = update_eff_dict(chemkin_data, species_list)
     third_body = np.zeros((len(complete_list), len(species_list)), dtype=float)
     reaction_numbers = chemkin_data[0]
-    print(eff_dict[20])
     el_numbers = []
     values = []
     for i, j in zip(range(len(eff_dict)), reaction_numbers):
@@ -605,7 +605,6 @@ def build_third_body_mat(chemkin_data, complete_list, species_list):
     #    arr_el_numbers = np.array(el_numbers).reshape(-1, 2)
     arr_el_numbers = [x for sublist in el_numbers for x in sublist]
     arr_values = [x for sublist in values for x in sublist]
-    print(arr_el_numbers)
 
     for (i, j), val in zip(arr_el_numbers, arr_values):
         #        print(val)
@@ -647,7 +646,7 @@ class KineticParams(object):
 
         return self.forward_rate_params
 
-    def get_forward_rate_constants(self, parameters, temp):
+    def get_forward_rate_constants(self, parameters, temp, convert):
         """
         Generating the forward rate constants for each reaction
         Parameters:
@@ -655,19 +654,24 @@ class KineticParams(object):
         parameters          : list
                             A list of Arrhenius paramters
         T                   : float, temperature
+        convert             : str
+                            unit conversion from 'convert' to JL
         Returns
         ____________
         forward_rate_parms  :    list
                             A list of forward rate constants (k_matrix)
         """
-
-        self.forward_rates = (eval(parameters[0]) *
-                              np.exp(- eval(parameters[2]) *
-                              KCAL_JL / (GAS_CONST * temp)))
+        factor = 0
+        if convert == 'cal':
+            factor = CAL_JL
+        if convert == 'kcal':
+            factor = KCAL_JL
+        self.forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
+                              np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
         return self.forward_rates
 
 
-def build_forward_rates(rateconstantlist, temp):
+def build_forward_rates(rateconstantlist, temp, convert='cal'):
     """
     This function builds the forward rate values for all
     the reactions. The Arrhenius rate parameters are found
@@ -678,6 +682,9 @@ def build_forward_rates(rateconstantlist, temp):
                             path or name of the file to read from
     temp                    : float
                             temperature
+    convert                 : str
+                            unit conversion from 'convert' to JL
+                            default = 'cal
     Returns
     ----------
     rate_constants      : list
@@ -688,7 +695,7 @@ def build_forward_rates(rateconstantlist, temp):
     for line in open(rateconstantlist, 'r').readlines():
         f_params = KineticParams()
         params = f_params.get_forward_rate_parameters(line)
-        rate_constants.append(f_params.get_forward_rate_constants(params, temp))
+        rate_constants.append(f_params.get_forward_rate_constants(params, temp, convert))
 
     return rate_constants
 
@@ -713,9 +720,9 @@ def update_rate_constants_for_pressure(chemkin_data, rate_constants, temp):
                         a list of updated forward rate constants for all
                         the reactions
     """
-    reaction_numbers = chemkin_data[1][0]
-    rate_params = chemkin_data[1][1]
-    troe_params = np.asarray(chemkin_data[1][2])
+    reaction_numbers = chemkin_data[2][0]
+    rate_params = chemkin_data[2][1]
+    troe_params = np.asarray(chemkin_data[2][2])
 
     for i, num in enumerate(reaction_numbers):
         k_0 = rate_constants[i]
@@ -851,11 +858,11 @@ def build_free_energy_change(free_energy, species_list, stoic_mat, factor, chemk
     free_energy_list = list(free_energy_sorted.values())
     gibbs_energy_list = np.dot(stoic_mat, free_energy_list) * factor
 
-    return gibbs_energy_list, mol_change
+    return gibbs_energy_list
 
 
 def build_reverse_rates(free_energy, species_list, stoic_mat,
-                       factor, forward_rates, temp, chemkin=True):
+                        factor, forward_rates, temp, chemkin=True):
     """"
     Calculates the reverse rate constants for all the reactions
     using the free energy change through the following steps
@@ -891,17 +898,13 @@ def build_reverse_rates(free_energy, species_list, stoic_mat,
     reverse_rates       : list
                          A list of reverse rate constants
     """
-
-    gibbs_energy, change_mol = build_free_energy_change(free_energy,
-                                                        species_list,
-                                                        stoic_mat, factor,
-                                                        chemkin)
-
-    equilibrium_constants = [np.exp(-n * 1000/(GAS_CONST * temp))
+    gibbs_energy = build_free_energy_change(free_energy, species_list, stoic_mat, 0.001, chemkin=True)
+    change_mol = stoic_mat.sum(axis=1, dtype=float)
+    equilibrium_constants = [np.exp(-n * 1000 / (GAS_CONST * temp))
                              for n in gibbs_energy]
-
+    #    print(forward_rates)
     reverse_rates = [(a / b) * (GAS_CONST * temp * 1000 / PR_ATM) ** c
-                     if c < 3 else 0 for (a, b, c) in
+                     for (a, b, c) in
                      zip(forward_rates, equilibrium_constants, change_mol)]
 
     return reverse_rates

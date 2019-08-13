@@ -7,7 +7,7 @@ import os
 
 def func_solv(data, forward_rate, file_rateconstant, file_energy,
               matrix, species_list, initial_y, t_final, factor,
-              third_body, chemkin_data=None,
+              third_body, pos=None, chemkin_data=None,
               smiles=None, chemkin=True):
     """
     Solves the system of ODEs for different rate constants
@@ -37,6 +37,12 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
                     final time in seconds
     factor              : float
                         conversion factor from given unit of energy to kJ
+    third_body          : ndarray
+                        matrix with third body efficiencies
+    pos                 : int
+                        position argument for multiprocessing
+    chemkin_data        :ndarray
+                        the data from parsed chemkin reaction file
     chemkin             : bool
                         indicates if chemkin files are read as input files
                         default = True
@@ -52,11 +58,11 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     temp = values[-1] + 273
     kf_actual = np.array(build_forward_rates(file_rateconstant, temp))
     kf_pur = np.array([actual * 10 ** rand for actual,
-                                               rand in zip(kf_actual, kf_random)])
+                       rand in zip(kf_actual, kf_random)])
     kf_purturbed = list(kf_pur)
     if chemkin:
         free_energy_dict = generate_thermo_dict(file_energy, smiles, temp)
-        forward_rate_constants = \
+        kf_purturbed = \
             update_rate_constants_for_pressure(chemkin_data,
                                                kf_purturbed, temp)
     else:
@@ -67,7 +73,7 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
                                 kr_purturbed, third_body=third_body,
                                 sim_time=t_final)
 
-    return sim[-1]
+    return pos, sim[-1]
 
 
 def serial(file_read, forward_rate, file_rateconstant, file_energy,
@@ -97,6 +103,10 @@ def serial(file_read, forward_rate, file_rateconstant, file_energy,
                     A list of initial concentrations
     t_final         : float
                     final time in seconds
+    third_body          : ndarray
+                        matrix with third body efficiencies
+    chemkin_data        :ndarray
+                        the data from parsed chemkin reaction file
     smiles             : dict
                     the smiles dictionary generated from
                     species_smiles.dat file
@@ -117,7 +127,7 @@ def serial(file_read, forward_rate, file_rateconstant, file_energy,
                       matrix, species_list, initial_y, t_final, factor,
                       third_body, chemkin_data,
                       smiles=smiles, chemkin=chemkin)
-            for data in read_file]
+            for (pos, data) in enumerate(read_file)]
 
 
 def multiprocess(processes, file_read, forward_rate, file_rateconstant,
@@ -149,6 +159,10 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
                     A list of initial concentrations
     t_final         : float
                     final time in seconds
+    third_body          : ndarray
+                        matrix with third body efficiencies
+    chemkin_data        :ndarray
+                        the data from parsed chemkin reaction file
     smiles             : dict
                     the smiles dictionary generated from
                     species_smiles.dat file
@@ -169,10 +183,11 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
     results = [pool.apply_async(func_solv, args=(
         data, forward_rate, file_rateconstant, file_energy,
         matrix, species_list, initial_y, t_final, factor,
-        third_body, chemkin_data, smiles, chemkin))
-               for data in read_file]
+        third_body, pos, chemkin_data, smiles, chemkin))
+               for (pos, data) in enumerate(read_file)]
     results = [p.get() for p in results]
     results.sort()  # to sort the results by input window width
+    results = [r[1] for r in results]
     return results
 
 

@@ -55,7 +55,8 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     kf_random = np.zeros((len(forward_rate)), dtype=float)
     values = list(map(float, data.split()))
     kf_random[:] = np.array(values[:len(forward_rate)])
-    temp = values[-1] + 273
+    # temp = values[-1] + 273
+    temp = 950.0
     kf_actual = np.array(build_forward_rates(file_rateconstant, temp))
     kf_pur = np.array([actual * 10 ** rand for actual,
                        rand in zip(kf_actual, kf_random)])

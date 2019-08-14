@@ -77,8 +77,8 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     return pos, sim[-1]
 
 
-def serial(file_read, forward_rate, file_rateconstant, file_energy,
-           matrix, species_list, factor,
+def serial_ss(file_read, forward_rate, file_rateconstant,
+           file_energy, matrix, species_list, factor,
            initial_y, t_final, third_body=None,
            chemkin_data=None, smiles=None, chemkin=True):
     """
@@ -124,11 +124,13 @@ def serial(file_read, forward_rate, file_rateconstant, file_energy,
                     of parameters listed in 'param_set.txt' file
     """
     read_file = open(file_read, "r")
-    return [func_solv(data, forward_rate, file_rateconstant, file_energy,
-                      matrix, species_list, initial_y, t_final, factor,
-                      third_body, chemkin_data,
-                      smiles=smiles, chemkin=chemkin)
-            for (pos, data) in enumerate(read_file)]
+    results = []
+    for pos, data in enumerate(read_file):
+        result = func_solv(data, forward_rate, file_rateconstant, file_energy,
+                           matrix, species_list, initial_y, t_final, factor,
+                           third_body, pos, chemkin_data, smiles, chemkin)
+        results.append(result)
+    return results
 
 
 def multiprocess(processes, file_read, forward_rate, file_rateconstant,

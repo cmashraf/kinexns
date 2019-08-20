@@ -1,6 +1,21 @@
 from assimulo.solvers import CVode
 from assimulo.problem import Explicit_Problem
 import numpy as np
+import warnings
+import sys
+import io
+
+from assimulo.solvers.sundials import CVodeError
+
+warnings.simplefilter('ignore')
+
+
+class Error(Exception):
+    pass
+
+
+class CVodeWarning(Error):
+    pass
 
 
 def initial_condition(species_list, indices_species, species_smile, concentration):
@@ -129,9 +144,26 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
     exp_sim.atol = [atol]  # Default 1e-6
     exp_sim.rtol = rtol  # Default 1e-6
     exp_sim.maxh = 0.1
+    exp_sim.minh = 1e-18
+#    exp_sim.num_threads = 1
+#    print(exp_sim.num_threads)
     #     exp_sim.display_progress = True
     #     exp_sim.linear_solver = "DENSE"
     # Simulate
-    t1, y1 = exp_sim.simulate(sim_time, num_data_points)
+#    t1, y1 = exp_sim.simulate(sim_time, num_data_points)
+    while True:
+        try:
+            t1, y1 = exp_sim.simulate(sim_time, num_data_points)
+        # text_trap = io.StringIO()
+        # if 'Warning' in text_trap:
+        #     print('warning')
+        #     raise CVodeWarning
+            break
+        except CVodeError:
+            print("next process started")
+            atol = atol * 1e-2
+            exp_sim.atol = atol
+            print(exp_sim.atol)
+
     return t1, y1
 

@@ -78,9 +78,9 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
 
 
 def serial_ss(file_read, forward_rate, file_rateconstant,
-           file_energy, matrix, species_list, factor,
-           initial_y, t_final, third_body=None,
-           chemkin_data=None, smiles=None, chemkin=True):
+              file_energy, matrix, species_list, factor,
+              initial_y, t_final, third_body=None,
+              chemkin_data=None, smiles=None, chemkin=True):
     """
     Iteratively solves the system of ODEs for different rate constants
     generated from the data file in serial

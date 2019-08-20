@@ -402,6 +402,7 @@ def parse_chemkin_reaction(file_name, smiles, file_reac, file_rate):
 
     pr_dependent = [pr_dependent_reactions, k_low, troe_value]
 
+    file.close()
     file_reactions.close()
     file_rate_constants.close()
 
@@ -519,8 +520,9 @@ def build_species_list(reaction_file):
     product_list = []
     species_name = []
     species_list = []
+    file = open(reaction_file, 'r')
 
-    for line in open(reaction_file, 'r').readlines():
+    for line in file:
         reac = Reaction()
         reactant_list.append(reac.get_reactants_name(line))
         product_list.append(reac.get_products_name(line))
@@ -530,7 +532,7 @@ def build_species_list(reaction_file):
         # print(species_name)
 
     species_list.sort()
-
+    file.close()
     return reactant_list, product_list, species_list
 
 
@@ -692,11 +694,12 @@ def build_forward_rates(rateconstantlist, temp, convert='cal'):
                         the reactions
     """
     rate_constants = []
-    for line in open(rateconstantlist, 'r').readlines():
+    file = open(rateconstantlist, 'r')
+    for line in file:
         f_params = KineticParams()
         params = f_params.get_forward_rate_parameters(line)
         rate_constants.append(f_params.get_forward_rate_constants(params, temp, convert))
-
+    file.close()
     return rate_constants
 
 
@@ -734,10 +737,15 @@ def update_rate_constants_for_pressure(chemkin_data, rate_constants, temp):
         else:
             if troe_params[i][2] == 0:
                 troe_params[i][2] = 1e-30
-            troe_value = (1 - troe_params[i][0]) * \
+            f_cent = (1 - troe_params[i][0]) * \
                 np.exp(- temp / troe_params[i][1]) + troe_params[i][0] *\
                 np.exp(- temp / troe_params[i][2]) + \
                 np.exp(- troe_params[i][3] / temp)
+            c = -0.4 - 0.67 * np.log10(f_cent)
+            n = 0.75 - 1.27 * np.log10(f_cent)
+            f1 = (np.log10(p_r) + c) / (n - 0.14 * (np.log10(p_r) + c))
+            log_f = np.log10(f_cent)/ (1 + f1 ** 2)
+            troe_value = 10 ** log_f
         rate_constants[num] = k_inf * (p_r / (1 + p_r)) * troe_value
     return rate_constants
 

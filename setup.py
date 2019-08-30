@@ -10,7 +10,7 @@ with open(ver_file) as f:
 #HERE = path.abspath(path.dirname(__file__))
 
 opts = dict(name="kinexns",
-            maintainer="Chowdhury Ashraf"
+            maintainer="Chowdhury Ashraf",
             maintainer_email="cmashraf@uw.edu",
             description="Building and optimizing kinetic models for bio-fuel pyrolysis",
             url="https://github.com/cmashraf/kinexns",

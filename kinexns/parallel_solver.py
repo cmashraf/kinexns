@@ -1,6 +1,7 @@
 import multiprocessing as mp
 from .ode_builder import *
 from .ode_solver import *
+from .parse_chemkin import *
 import numpy as np
 import os
 import pandas as pd

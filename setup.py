@@ -1,5 +1,7 @@
 import os
 from setuptools import setup, find_packages
+from kinexns.version import *
+
 PACKAGES = find_packages()
 
 # Get version and release info, which is all stored in kmpy/version.py
@@ -28,4 +30,4 @@ opts = dict(name="kinexns",
 
 
 if __name__ == '__main__':
-    setup(**opts)
+    setup(install_requires=['numpy', 'pandas'])

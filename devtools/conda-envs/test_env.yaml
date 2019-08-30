@@ -1,10 +1,11 @@
 name: test
 channels:
+  - rdkit
+  - conda-forge
+  - openbabel
 dependencies:
     # Base depends
-  - python
-  - pip
-
+  - python>=3.6
     # Testing
   - pytest
   - pytest-cov

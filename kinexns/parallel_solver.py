@@ -3,6 +3,7 @@ from .ode_builder import *
 from .ode_solver import *
 import numpy as np
 import os
+import pandas as pd
 
 
 def func_solv(data, forward_rate, file_rateconstant, file_energy,

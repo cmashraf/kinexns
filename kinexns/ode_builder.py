@@ -106,6 +106,7 @@ def parse_chemkin_thermo(file_name, dictionary):
 
     # number of lines in each chunk
     num = 4
+    low, mid, high = 0.0, 0.0, 0.0
     #     file = open(file_name, 'r')
 
     species_list = []

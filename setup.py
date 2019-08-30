@@ -9,18 +9,17 @@ with open(ver_file) as f:
 
 #HERE = path.abspath(path.dirname(__file__))
 
-opts = dict(name=NAME,
-            maintainer=MAINTAINER,
-            maintainer_email=MAINTAINER_EMAIL,
-            description=DESCRIPTION,
-            long_description=LONG_DESCRIPTION,
-            url=URL,
-            download_url=DOWNLOAD_URL,
-            license=LICENSE,
+opts = dict(name="kinexns",
+            maintainer="Chowdhury Ashraf"
+            maintainer_email="cmashraf@uw.edu",
+            description="Building and optimizing kinetic models for bio-fuel pyrolysis",
+            url="https://github.com/cmashraf/kinexns",
+            download_url="https://github.com/cmashraf/kinexns",
+            license="MIT",
             classifiers=CLASSIFIERS,
-            author=AUTHOR,
-            author_email=AUTHOR_EMAIL,
-            platforms=PLATFORMS,
+            author="Chowdhury Ashraf",
+            author_email="cmashraf@uw.edu",
+            platforms="OS independent",
             version=VERSION,
             packages=PACKAGES,
             package_data=PACKAGE_DATA,

@@ -307,6 +307,34 @@ def write_reactions(string, smiles, file_reaction, file_rate_cons):
     file_rate_cons.write(s2[-3] + ' ' + s2[-2] + ' ' + s2[-1] + '\n')
 
 
+def parse_pr_three_body_data(line_data, k_low, troe_value, three_body_eff, low_count, troe_count, smiles):
+    if any(item in line_data for item in ['/', 'LOW', 'TROE']):
+        if 'LOW' in line_data:
+            low_count = low_count + 1
+            s = line_data.split()
+            k_low.append([float(s[2]), float(s[3]), float(s[4])])
+        elif 'TROE' in line_data:
+            troe_count = troe_count + 1
+            if troe_count != low_count:
+                troe_value.append([0])
+                troe_count = troe_count + 1
+            s = line_data.split()
+            if len(s) == 6:
+                troe_value.append([float(s[1]), float(s[2]), float(s[3]), float(s[4])])
+            else:
+                troe_value.append([float(s[1]), float(s[2]), float(s[3]), 1e10])
+        else:
+            s = line_data.split()
+            keys = [s[i].split('/')[0] for i in range(len(s))]
+            keys_smi = [smiles[key] for key in keys]
+            values = [s[i].split('/')[1] for i in range(len(s))]
+
+            dictionary = dict(zip(keys_smi, values))
+            #                dictList.append()
+            three_body_eff.append(dictionary)
+    return k_low, troe_value, three_body_eff, low_count, troe_count
+
+
 def parse_chemkin_reaction(file_name, smiles, file_reac, file_rate):
     """
     This function parse the chemkin reaction mechanism file with the
@@ -369,37 +397,13 @@ def parse_chemkin_reaction(file_name, smiles, file_reac, file_rate):
         if '()' in line:
             line = re.sub(r'[()]', '', line)
             pr_dependent_reactions.append(i)
-        if any(item in line for item in ['/', 'LOW', 'TROE']):
-            if 'LOW' in line:
-                low_count = low_count + 1
-                s = line.split()
-                k_low.append([float(s[2]), float(s[3]), float(s[4])])
-            elif 'TROE' in line:
-                troe_count = troe_count + 1
-                if troe_count != low_count:
-                    troe_value.append([0])
-                    troe_count = troe_count + 1
-                s = line.split()
-                if len(s) == 6:
-                    troe_value.append([float(s[1]), float(s[2]),
-                                       float(s[3]), float(s[4])])
-                else:
-                    troe_value.append([float(s[1]), float(s[2]),
-                                       float(s[3]), 1e10])
-            else:
-                s = line.split()
-                keys = [s[i].split('/')[0] for i in range(len(s))]
-                keys_smi = [smiles[key] for key in keys]
-                values = [s[i].split('/')[1] for i in range(len(s))]
-
-                dictionary = dict(zip(keys_smi, values))
-                #                dictList.append()
-                three_body_eff.append(dictionary)
 
         if '=' in line:
             write_reactions(line, smiles, file_reactions, file_rate_constants)
             i = i + 1
-
+        k_low, troe_value, three_body_eff, low_count, troe_count = \
+            parse_pr_three_body_data(line, k_low, troe_value, three_body_eff,
+                                     low_count, troe_count, smiles)
     pr_dependent = [pr_dependent_reactions, k_low, troe_value]
 
     file.close()

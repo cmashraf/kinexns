@@ -30,9 +30,9 @@ description = "shablona: a template for small scientific Python projects"
 #  Long description will go up on the pypi page
 long_description = """
 
-kmpy
+kinexns
 ========
-kmpy is a tool to build kinetic models with given reaction mechanism
+kinexns is a tool to build kinetic models with given reaction mechanism
 and optimize the model parameters by solving ODEs.
 
 It contains software implementations of an analysis of some simple data, but
@@ -57,12 +57,12 @@ Copyright (c) 2015--, Ariel Rokem, The University of Washington
 eScience Institute.
 """
 
-NAME = "kmpy"
+NAME = "kinexns"
 MAINTAINER = "Chowdhury Ashraf"
 MAINTAINER_EMAIL = "cmashraf@uw.edu"
 DESCRIPTION = "Building and optimizing kinetic models for bio-fuel pyrolysis"
 LONG_DESCRIPTION = long_description
-URL = "https://github.com/cmashraf/kmpy"
+URL = "https://github.com/cmashraf/kinexns"
 DOWNLOAD_URL = ""
 LICENSE = "MIT"
 AUTHOR = "Chowdhury Ashraf"
@@ -72,5 +72,5 @@ MAJOR = _version_major
 MINOR = _version_minor
 MICRO = _version_micro
 VERSION = __version__
-PACKAGE_DATA = {'kmpy': [pjoin('data', '*')]}
+PACKAGE_DATA = {'kinexns': [pjoin('data', '*')]}
 REQUIRES = ["numpy"]

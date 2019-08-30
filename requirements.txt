@@ -1,6 +1,0 @@
-numpy
-pandas
-assimulo
-rdkit
-PIL
-matplotlib

@@ -159,7 +159,7 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
             print("next process started")
             atol = atol * 1e-2
             exp_sim.atol = atol
-            print(exp_sim.atol)
+            # print(exp_sim.atol)
 
     return t1, y1
 

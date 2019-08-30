@@ -263,7 +263,8 @@ def parse_sa_analysis(path):
     return dict_dfs
 
 
-def get_top_ones(path, species, number=5):
+def get_top_ones(path, species, coeff = 'total',number=5):
+
     sens_dfs = parse_sa_analysis(path)
 
     df = sens_dfs[species][0]
@@ -274,12 +275,13 @@ def get_top_ones(path, species, number=5):
             ('ST_conf' not in df) or ('S1_conf' not in df)):
         raise Exception('Dataframe not formatted correctly')
 
-    # Remove rows which have values less than cutoff values
-    #    df = df[df['ST'] > 0.01]
-    #    df = df.dropna()
-    #    print(df)
-    #    # Only keep top values indicated by variable top
-    df = df.nlargest(top, 'ST')
+    if coeff == 'total':
+        df['placeholder'] = abs(df.ST)
+    else:
+        df['placeholder'] = abs(df.S1)
+
+    df = df.nlargest(top, 'placeholder')
+    df = df.drop('placeholder', axis=1)
     df = df.reset_index(drop=True)
     return df
 
@@ -331,12 +333,17 @@ def save_top_reactions(image_path, reactions, species, completelist):
     rxn_image.save(image_path + 'sensitive_reactions_{}.png'.format(species))
 
 
-def plot_sensitivity_results(df):
+def plot_sensitivity_results(df, coeff='total'):
 
-    sensitivity = pd.Series(df.ST)
-    parameter = pd.Series(df.Parameter)
+    parameter = list(df.Parameter)
+    if coeff == 'total':
+        sensitivity = list(df.ST)
 #   order = np.array(['ST'] * len(df)
-    confidence = pd.Series(df.ST_conf)
+        confidence = list(df.ST_conf)
+    else:
+        sensitivity = list(df.S1)
+        #   order = np.array(['ST'] * len(df)
+        confidence = list(df.S1_conf)
     #            yerr = [x + e for x,e in zip(sensitivity, confidence) ]
     #            lower = [x - e/2 for x,e in zip(sensitivity, confidence) ]
 

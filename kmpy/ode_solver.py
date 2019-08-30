@@ -7,16 +7,6 @@ import io
 
 from assimulo.solvers.sundials import CVodeError
 
-warnings.simplefilter('ignore')
-
-
-class Error(Exception):
-    pass
-
-
-class CVodeWarning(Error):
-    pass
-
 
 def initial_condition(species_list, indices_species, species_smile, concentration):
     """
@@ -100,11 +90,11 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
 
     # y0[0] = 0
     # y0[0] = 0
-    dydt = np.zeros((len(species_list)), dtype=float)
+    # dydt = np.zeros((len(species_list)), dtype=float)
     # Define the rhs
     kf = forward_rate
     kr = rev_rate
-    mat_reac = np.asarray(np.where(matrix < 0, matrix, 0))
+    mat_reac = np.abs(np.asarray(np.where(matrix < 0, matrix, 0)))
     mat_prod = np.asarray(np.where(matrix > 0, matrix, 0))
 
     #  d = kf * np.prod(y0**np.abs(mat_reac), axis = 1) - kr * np.prod(y0**mat_prod, axis = 1)
@@ -121,12 +111,18 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
         else:
             third_body_eff = np.ones(len(forward_rate))
         #            print(len(third_body_matrix))
-        for i in range(len(species_list)):
-            temp_value = matrix[:, i] * \
-                         (kf * np.prod(y ** np.abs(mat_reac), axis=1)
-                          - kr * np.prod(y ** mat_prod, axis=1))
-            dydt[i] = np.sum(third_body_eff * temp_value)
+        rate_concentration = (kf * np.prod(np.power(y, mat_reac), axis=1)
+                              - kr * np.prod(np.power(y, mat_prod), axis=1))
+        # for i in range(len(species_list)):
+        #     temp_value = matrix[:, i] * rate_concentration
+        #
+        #     dydt[i] = np.sum(third_body_eff * temp_value)
         #        print(y.min())
+        dydt = np.dot(third_body_eff,
+                      np.multiply(matrix, rate_concentration.reshape
+                                  (matrix.shape[0], 1)))
+        # dydt = [np.sum(third_body_eff * (matrix[:, i] * rate_concentration)) for i in
+        #         range(len(species_list))]
         del t
         del y
         return dydt
@@ -145,7 +141,7 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
     exp_sim.rtol = rtol  # Default 1e-6
     exp_sim.maxh = 0.1
     exp_sim.minh = 1e-18
-#    exp_sim.num_threads = 1
+    exp_sim.num_threads = 1
 #    print(exp_sim.num_threads)
     #     exp_sim.display_progress = True
     #     exp_sim.linear_solver = "DENSE"

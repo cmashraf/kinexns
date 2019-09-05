@@ -10,7 +10,7 @@ import pandas as pd
 def func_solv(data, forward_rate, file_rateconstant, file_energy,
               matrix, species_list, initial_y, t_final, factor,
               third_body, pos=None, chemkin_data=None,
-              smiles=None, chemkin=True):
+              smiles=None):
     """
     Solves the system of ODEs for different rate constants
     generated from the data file
@@ -45,9 +45,6 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
                         position argument for multiprocessing
     chemkin_data        :ndarray
                         the data from parsed chemkin reaction file
-    chemkin             : bool
-                        indicates if chemkin files are read as input files
-                        default = True
     Returns
     ----------
     sim[-1]         : list
@@ -63,12 +60,14 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     kf_pur = np.array([actual * 10 ** rand for actual,
                        rand in zip(kf_actual, kf_random)])
     kf_purturbed = list(kf_pur)
-    if chemkin:
+    if chemkin_data:
+        chemkin = True
         free_energy_dict = generate_thermo_dict(file_energy, smiles, temp)
         kf_purturbed = \
             update_rate_constants_for_pressure(chemkin_data,
                                                kf_purturbed, temp)
     else:
+        chemkin = False
         free_energy_dict = build_free_energy_dict(file_energy, temp)
     kr_purturbed = build_reverse_rates(free_energy_dict, species_list, matrix,
                                        factor, kf_purturbed, temp, chemkin)

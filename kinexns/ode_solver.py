@@ -36,17 +36,15 @@ def initial_condition(species_list, indices_species, species_smile, concentratio
     return y0
 
 
-def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
+def stiff_ode_solver(matrix, y_initial, forward_rate,
                      rev_rate, third_body=None,
                      iteration='Newton', discr='BDF',
-                     atol=1e-10, rtol=1e-7,
+                     atol=1e-10, rtol=1e-6,
                      sim_time=0.001, num_data_points=500):
     """
     Sets up the initial condition for solving the odes
     Parameters
     ----------
-    species_list     : list
-                     A list of unique species in the mechanism
     matrix          : ndarray
                     stoichiometric matrix
     y_initial       : list
@@ -162,4 +160,3 @@ def stiff_ode_solver(species_list, matrix, y_initial, forward_rate,
             # print(exp_sim.atol)
 
     return t1, y1
-

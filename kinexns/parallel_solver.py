@@ -71,7 +71,7 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
         free_energy_dict = build_free_energy_dict(file_energy, temp)
     kr_purturbed = build_reverse_rates(free_energy_dict, species_list, matrix,
                                        factor, kf_purturbed, temp, chemkin)
-    mod, sim = stiff_ode_solver(species_list, matrix, initial_y, kf_purturbed,
+    mod, sim = stiff_ode_solver(matrix, initial_y, kf_purturbed,
                                 kr_purturbed, third_body=third_body,
                                 sim_time=t_final)
 
@@ -129,7 +129,7 @@ def serial_ss(file_read, forward_rate, file_rateconstant,
     for pos, data in enumerate(read_file):
         result = func_solv(data, forward_rate, file_rateconstant, file_energy,
                            matrix, species_list, initial_y, t_final, factor,
-                           third_body, pos, chemkin_data, smiles, chemkin)
+                           third_body, pos, chemkin_data, smiles)
         results.append(result)
     return results
 
@@ -187,7 +187,7 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
     results = [pool.apply_async(func_solv, args=(
         data, forward_rate, file_rateconstant, file_energy,
         matrix, species_list, initial_y, t_final, factor,
-        third_body, pos, chemkin_data, smiles, chemkin))
+        third_body, pos, chemkin_data, smiles))
                for (pos, data) in enumerate(read_file)]
     results = [p.get() for p in results]
     results.sort()  # to sort the results by input window width

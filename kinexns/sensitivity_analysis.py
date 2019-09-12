@@ -228,6 +228,7 @@ def parse_sa_analysis(path):
 
     filenames = [filename for filename in os.listdir(
                      path) if filename.startswith('analysis')]
+    print(filenames)
 
     dict_dfs = {}
 
@@ -263,7 +264,7 @@ def parse_sa_analysis(path):
     return dict_dfs
 
 
-def get_top_ones(path, species, coeff = 'total',number=5):
+def get_top_ones(path, species, coeff='total', number=5):
 
     sens_dfs = parse_sa_analysis(path)
 

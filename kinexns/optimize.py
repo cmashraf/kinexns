@@ -1,5 +1,6 @@
 import numpy as np
 import spotpy
+import multiprocessing as mp
 from .ode_solver import *
 from .ode_builder import *
 from .parse_chemkin import *
@@ -7,31 +8,31 @@ from .parse_chemkin import *
 
 class SpotpySetup(object):
 
-    def __init__(self, opt_parameters, initial_guess, sp_indices,
-                 opt_dist, cost_func, forward_rate, file_rateconstant,
-                 file_energy, matrix, species_list, initial_y,
-                 t_final, third_body,algorithm, temp, opt_species='all',
+    def __init__(self, opt_params, initial_val, sp_indices,
+                 opt_dist, cost_function, forward_rate, rateconstant_file,
+                 energy_file, matrix, species_list, initial_y,
+                 final_t, third_body, algorithm, temper, opt_species='all',
                  chemkin_data=None, smiles=None, factor=0.001):
 
-        self.parameternames = opt_parameters
-        self.initial_guess = initial_guess
+        self.parameternames = opt_params
+        self.initial_guess = initial_val
         self.speciesnames = opt_species
-        self.cost_func = cost_func
+        self.cost_func = cost_function
         self.dim = len(self.parameternames)
         self.params = []
         self.forward_rates = forward_rate
         self.opt_dist = opt_dist
         self.sp_indices = sp_indices
-        self.rateconstant = file_rateconstant
-        self.energy = file_energy
+        self.rateconstant = rateconstant_file
+        self.energy = energy_file
         self.matrix = matrix
         self.species_list = species_list
         self.initial_y = initial_y
-        self.t_final = t_final
+        self.t_final = final_t
         self.algorithm = algorithm
         self.factor = factor
         self.third_body = third_body
-        self.temp = temp
+        self.temp = temper
         # self.pos = pos
         self.chemkin_data = chemkin_data
         self.smiles = smiles
@@ -69,7 +70,7 @@ class SpotpySetup(object):
             chemkin = True
             free_energy_dict = generate_thermo_dict(self.energy,
                                                     self.smiles, self.temp)
-            kf_purturbed = \
+            forward_rate_param = \
                 update_rate_constants_for_pressure(self.chemkin_data,
                                                    forward_rate_param,
                                                    self.temp)
@@ -119,3 +120,45 @@ class SpotpySetup(object):
         return objectivefunction
 
 
+def optimization(pos, repetation, opt_params, initial_val, sp_indices,
+                 opt_dist, cost_function, forward_rate, rate_file,
+                 energy_file, matrix, species_list, initial_y,
+                 final_t, third_body, algorithm, temper, opt_species='all',
+                 factor=0.001, chemkin_data=None, smiles=None):
+    print(algorithm)
+    parallel = "seq"
+    dbformat = "csv"
+    timeout = 1e6
+    spot_setup = SpotpySetup(opt_params, initial_val, sp_indices, opt_dist, cost_function,
+                             forward_rate, rate_file, energy_file, matrix,
+                             species_list, initial_y, final_t, third_body,
+                             algorithm, temper, opt_species,
+                             factor=factor, chemkin_data=chemkin_data, smiles=smiles)
+
+    sampler = getattr(spotpy.algorithms, algorithm)(spot_setup, parallel=parallel, dbname='{}'.format(algorithm),
+                                                    dbformat=dbformat, sim_timeout=timeout)
+
+    print(sampler)
+    sampler.sample(repetation)
+    result = sampler.getdata()
+    # print(results)
+    return pos, result
+
+
+def multi_optimization(processes, rep, opt_params, initial_val,
+                       sp_indices, opt_dist, cost_function, forward_rate,
+                       rate_file, energy_file, matrix, species_list, initial_y,
+                       final_t, algorithms, temper, opt_species='all', third_body=None,
+                       chemkin_data=None, smiles=None, factor=0.001):
+    pool = mp.Pool(processes=processes)
+    results = [pool.apply_async
+               (optimization, args=(pos, rep, opt_params, initial_val, sp_indices,
+                                    opt_dist, cost_function, forward_rate, rate_file,
+                                    energy_file, matrix, species_list, initial_y,
+                                    final_t, third_body, al, temper, opt_species,
+                                    factor, chemkin_data, smiles))
+               for (pos, al) in enumerate(algorithms)]
+    results = [p.get() for p in results]
+    results.sort()  # to sort the results by input window width
+    results = [r[1] for r in results]
+    return results

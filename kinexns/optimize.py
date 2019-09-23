@@ -41,7 +41,7 @@ class SpotpySetup(object):
         # generate parameter sets for the given parameters
         for i in range(self.dim):
             self.params.append(spotpy.parameter.Uniform
-                               (self.parameternames[i], 1e-2, 1e2, 0.1, 1))
+                               (self.parameternames[i], -1, 1, 0.02, 0.0))
 
         self.obs = []
         if self.speciesnames == 'all':
@@ -64,7 +64,7 @@ class SpotpySetup(object):
 
             # print(forward_rate_param[230])
             forward_rate_param[int(parm[1:])] = \
-                x[i] * forward_rate_param[int(parm[1:])]
+                np.multiply(np.power(10, x[i]), forward_rate_param[int(parm[1:])])
             # print(forward_rate_param[230])
         if self.chemkin_data:
             chemkin = True
@@ -109,15 +109,26 @@ class SpotpySetup(object):
 
     def objectivefunction(self, simulation, evaluation):
         #         print(self.algorithm)
-        if self.algorithm in ['abc', 'fscabc']:
-            objectivefunction = getattr(spotpy.objectivefunctions,
-                                        self.cost_func)(evaluation,
-                                                        simulation)
+        if self.cost_func == 'sae':
+            if self.algorithm in ['abc', 'fscabc']:
+                objectivefunction = sae_func(evaluation, simulation)
+            else:
+                objectivefunction = - sae_func(evaluation, simulation)
+
         else:
-            objectivefunction = - getattr(spotpy.objectivefunctions,
-                                          self.cost_func)(evaluation,
-                                                          simulation)
-        return objectivefunction
+            if self.algorithm in ['abc', 'fscabc']:
+                objectivefunction = getattr(spotpy.objectivefunctions,
+                                            self.cost_func)(evaluation,
+                                                            simulation)
+            else:
+                objectivefunction = - getattr(spotpy.objectivefunctions,
+                                              self.cost_func)(evaluation,
+                                                              simulation)
+
+
+def sae_func(predictions, targets):
+
+    return ((np.array(predictions) - np.array(targets)) ** 2).sum()
 
 
 def optimization(pos, repetation, opt_params, initial_val, sp_indices,
@@ -136,10 +147,12 @@ def optimization(pos, repetation, opt_params, initial_val, sp_indices,
                              factor=factor, chemkin_data=chemkin_data, smiles=smiles)
 
     sampler = getattr(spotpy.algorithms, algorithm)(spot_setup, parallel=parallel, dbname='{}'.format(algorithm),
-                                                    dbformat=dbformat, sim_timeout=timeout)
+                                                    dbformat=dbformat, save_sim=False, sim_timeout=timeout)
 
-    print(sampler)
+    #print(sampler)
     sampler.sample(repetation)
+    #if algorithm == 'sa':
+    #    sampler.sample(repetation, Tini=200)
     result = sampler.getdata()
     # print(results)
     return pos, result

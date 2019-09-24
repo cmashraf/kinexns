@@ -51,6 +51,7 @@ class SpotpySetup(object):
                 self.opt_dist = np.array(self.opt_dist)
                 self.obs.append(self.opt_dist[:, self.sp_indices[sp]])
         self.opt_obs = np.array(self.obs).flatten()
+
         self.database = open('{}.txt'.format(self.algorithm), 'w')
 
     def parameters(self):
@@ -125,11 +126,12 @@ class SpotpySetup(object):
                 objectivefunction = - getattr(spotpy.objectivefunctions,
                                               self.cost_func)(evaluation,
                                                               simulation)
+
         return objectivefunction
 
     def save(self, objectivefunctions, parameter, simulations, chains=None):
-        line = str(objectivefunctions) + ',' + str(parameter).strip('[]') + '\n'
-        print(line)
+        line = str(objectivefunctions) + ',' + str(parameter).strip('[]') + ',' + '\n'
+        #print(line)
         self.database.write(line)
 
 
@@ -137,14 +139,14 @@ def sae_func(predictions, targets):
     return ((np.array(predictions) - np.array(targets)) ** 2).sum()
 
 
-def optimization(pos, repetation, opt_params, initial_val, sp_indices,
+def optimization(pos, rep, opt_params, initial_val, sp_indices,
                  opt_dist, cost_function, forward_rate, rate_file,
                  energy_file, matrix, species_list, initial_y,
                  final_t, third_body, algorithm, temper, opt_species='all',
                  factor=0.001, chemkin_data=None, smiles=None):
     print(algorithm)
     parallel = "seq"
-    dbformat = "csv"
+    dbformat = "custom"
     timeout = 1e6
     spot_setup = SpotpySetup(opt_params, initial_val, sp_indices, opt_dist, cost_function,
                              forward_rate, rate_file, energy_file, matrix,
@@ -153,13 +155,10 @@ def optimization(pos, repetation, opt_params, initial_val, sp_indices,
                              factor=factor, chemkin_data=chemkin_data, smiles=smiles)
 
     sampler = getattr(spotpy.algorithms, algorithm)(spot_setup,
-                                                    parallel=parallel,
-                                                    dbformat=dbformat,
-                                                    save_sim=False,
-                                                    sim_timeout=timeout)
+                                                    dbformat=dbformat)
 
     # print(sampler)
-    sampler.sample(repetation)
+    sampler.sample(rep)
     spot_setup.database.close()
     # if algorithm == 'sa':
     #    sampler.sample(repetation, Tini=200)
@@ -173,6 +172,7 @@ def multi_optimization(processes, rep, opt_params, initial_val,
                        rate_file, energy_file, matrix, species_list, initial_y,
                        final_t, algorithms, temper, opt_species='all', third_body=None,
                        chemkin_data=None, smiles=None, factor=0.001):
+    print(processes)
     pool = mp.Pool(processes=processes)
     results = [pool.apply_async
                (optimization, args=(pos, rep, opt_params, initial_val, sp_indices,
@@ -181,7 +181,7 @@ def multi_optimization(processes, rep, opt_params, initial_val,
                                     final_t, third_body, al, temper, opt_species,
                                     factor, chemkin_data, smiles))
                for (pos, al) in enumerate(algorithms)]
-    # results = [p.get() for p in results]
-    # results.sort()  # to sort the results by input window width
-    # results = [r[1] for r in results]
-    # return results
+    results = [p.get() for p in results]
+    results.sort()  # to sort the results by input window width
+    results = [r[1] for r in results]
+    return results

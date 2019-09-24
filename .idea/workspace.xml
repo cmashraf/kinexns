@@ -201,8 +201,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/kinexns/optimize.py</url>
-          <line>46</line>
-          <option name="timeStamp" value="2" />
+          <line>180</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

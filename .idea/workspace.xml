@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/reaction_class.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/reaction_class.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kinexns/optimize.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/optimize.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -199,6 +198,13 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/kinexns/optimize.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">

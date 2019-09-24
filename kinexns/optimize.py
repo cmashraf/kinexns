@@ -51,6 +51,7 @@ class SpotpySetup(object):
                 self.opt_dist = np.array(self.opt_dist)
                 self.obs.append(self.opt_dist[:, self.sp_indices[sp]])
         self.opt_obs = np.array(self.obs).flatten()
+        self.database = open('{}.txt'.format(self.algorithm), 'w')
 
     def parameters(self):
         return spotpy.parameter.generate(self.params)
@@ -124,10 +125,15 @@ class SpotpySetup(object):
                 objectivefunction = - getattr(spotpy.objectivefunctions,
                                               self.cost_func)(evaluation,
                                                               simulation)
+        return objectivefunction
+
+    def save(self, objectivefunctions, parameter, simulations, chains=None):
+        line = str(objectivefunctions) + ',' + str(parameter).strip('[]') + '\n'
+        print(line)
+        self.database.write(line)
 
 
 def sae_func(predictions, targets):
-
     return ((np.array(predictions) - np.array(targets)) ** 2).sum()
 
 
@@ -146,12 +152,16 @@ def optimization(pos, repetation, opt_params, initial_val, sp_indices,
                              algorithm, temper, opt_species,
                              factor=factor, chemkin_data=chemkin_data, smiles=smiles)
 
-    sampler = getattr(spotpy.algorithms, algorithm)(spot_setup, parallel=parallel, dbname='{}'.format(algorithm),
-                                                    dbformat=dbformat, save_sim=False, sim_timeout=timeout)
+    sampler = getattr(spotpy.algorithms, algorithm)(spot_setup,
+                                                    parallel=parallel,
+                                                    dbformat=dbformat,
+                                                    save_sim=False,
+                                                    sim_timeout=timeout)
 
-    #print(sampler)
+    # print(sampler)
     sampler.sample(repetation)
-    #if algorithm == 'sa':
+    spot_setup.database.close()
+    # if algorithm == 'sa':
     #    sampler.sample(repetation, Tini=200)
     result = sampler.getdata()
     # print(results)
@@ -171,7 +181,7 @@ def multi_optimization(processes, rep, opt_params, initial_val,
                                     final_t, third_body, al, temper, opt_species,
                                     factor, chemkin_data, smiles))
                for (pos, al) in enumerate(algorithms)]
-    results = [p.get() for p in results]
-    results.sort()  # to sort the results by input window width
-    results = [r[1] for r in results]
-    return results
+    # results = [p.get() for p in results]
+    # results.sort()  # to sort the results by input window width
+    # results = [r[1] for r in results]
+    # return results

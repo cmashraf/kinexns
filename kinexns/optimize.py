@@ -12,7 +12,7 @@ class SpotpySetup(object):
                  opt_dist, cost_function, forward_rate, rateconstant_file,
                  energy_file, matrix, species_list, initial_y,
                  final_t, third_body, algorithm, temper, opt_species='all',
-                 chemkin_data=None, smiles=None, factor=0.001):
+                 chemkin_data=None, smiles=None, factor=0.001, pos=1):
 
         self.parameternames = opt_params
         self.initial_guess = initial_val
@@ -59,7 +59,8 @@ class SpotpySetup(object):
         self.opt_obs = np.array(self.obs).flatten()
         self.opt_test_obs = np.array(self.test_obs).flatten()
 
-        self.database = open('{}.txt'.format(self.algorithm), 'w')
+        file_name = str(pos) + '_' + '{}.csv'.format(self.algorithm)
+        self.database = open(file_name, 'w')
 
     def parameters(self):
         return spotpy.parameter.generate(self.params)
@@ -130,31 +131,31 @@ class SpotpySetup(object):
         print(len(simulation[1]))
         if self.cost_func == 'sae':
             if self.algorithm in ['abc', 'fscabc']:
-                objectivefunction = sae_func(evaluation[0], simulation[0])
+                objective_function = sae_func(evaluation[0], simulation[0])
                 self.test_objectivefunction = sae_func(evaluation[1],
                                                        simulation[1])
             else:
-                objectivefunction = - sae_func(evaluation[0], simulation[0])
+                objective_function = - sae_func(evaluation[0], simulation[0])
                 self.test_objectivefunction = - sae_func(evaluation[1],
                                                          simulation[1])
         else:
             if self.algorithm in ['abc', 'fscabc']:
-                objectivefunction = getattr(spotpy.objectivefunctions,
+                objective_function = getattr(spotpy.objectivefunctions,
                                             self.cost_func)(evaluation[0],
                                                             simulation[0])
                 self.test_objectivefunction = \
                     getattr(spotpy.objectivefunctions,
                             self.cost_func)(evaluation[1], simulation[1])
             else:
-                objectivefunction = - getattr(spotpy.objectivefunctions,
+                objective_function = - getattr(spotpy.objectivefunctions,
                                               self.cost_func)(evaluation[0],
                                                               simulation[0])
                 self.test_objectivefunction = \
                     - getattr(spotpy.objectivefunctions,
                               self.cost_func)(evaluation[1], simulation[1])
-        return objectivefunction
+        return objective_function
 
-    def save(self, objectivefunction, parameter, simulation, chains=None):
+    def save(self, objectivefunctions, parameter, simulations, chains=None):
         parameter = list(parameter)
         line = str(objectivefunction) + ',' + str(self.test_objectivefunction) \
             + ',' + str(parameter).strip('[]') + '\n'
@@ -178,7 +179,7 @@ def optimization(pos, rep, opt_params, initial_val, sp_indices,
                              forward_rate, rate_file, energy_file, matrix,
                              species_list, initial_y, final_t, third_body,
                              algorithm, temper, opt_species,
-                             factor=factor, chemkin_data=chemkin_data, smiles=smiles)
+                             factor=factor, chemkin_data=chemkin_data, smiles=smiles, pos=pos)
 
     sampler = getattr(spotpy.algorithms, algorithm)(spot_setup,
                                                     dbformat=dbformat)

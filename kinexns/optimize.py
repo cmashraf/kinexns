@@ -113,7 +113,7 @@ class SpotpySetup(object):
         simulations = [i / (0.1 * j) if j > 0.0 else i for i, j in
                        zip(results, self.opt_obs)]
         test_simulations = [i / (0.1 * j) if j > 0.0 else i for i, j in
-                            zip(test_results, self.opt_obs)]
+                            zip(test_results, self.opt_test_obs)]
         #        print(simulations)
         return simulations, test_simulations
 
@@ -123,41 +123,41 @@ class SpotpySetup(object):
                         for j in self.opt_obs]
         test_observations = [j / (0.1 * j) if j > 0.0 else 0.0
                              for j in self.opt_test_obs]
-        return observations
+        return observations, test_observations
 
     def objectivefunction(self, simulation, evaluation):
         #         print(self.algorithm)
+        print(len(simulation[1]))
         if self.cost_func == 'sae':
             if self.algorithm in ['abc', 'fscabc']:
                 objectivefunction = sae_func(evaluation[0], simulation[0])
-                test_objectivefunction = sae_func(evaluation[1],
-                                                  simulation[1])
+                self.test_objectivefunction = sae_func(evaluation[1],
+                                                       simulation[1])
             else:
                 objectivefunction = - sae_func(evaluation[0], simulation[0])
-                test_objectivefunction = - sae_func(evaluation[1],
-                                                    simulation[1])
-
+                self.test_objectivefunction = - sae_func(evaluation[1],
+                                                         simulation[1])
         else:
             if self.algorithm in ['abc', 'fscabc']:
                 objectivefunction = getattr(spotpy.objectivefunctions,
                                             self.cost_func)(evaluation[0],
                                                             simulation[0])
-                test_objectivefunction = \
+                self.test_objectivefunction = \
                     getattr(spotpy.objectivefunctions,
                             self.cost_func)(evaluation[1], simulation[1])
             else:
                 objectivefunction = - getattr(spotpy.objectivefunctions,
                                               self.cost_func)(evaluation[0],
                                                               simulation[0])
-                test_objectivefunction = \
+                self.test_objectivefunction = \
                     - getattr(spotpy.objectivefunctions,
                               self.cost_func)(evaluation[1], simulation[1])
-
         return objectivefunction
 
-    def save(self, objectivefunctions, parameter, simulations, chains=None):
+    def save(self, objectivefunction, parameter, simulation, chains=None):
         parameter = list(parameter)
-        line = str(objectivefunctions) + ',' + str(parameter).strip('[]') + '\n'
+        line = str(objectivefunction) + ',' + str(self.test_objectivefunction) \
+            + ',' + str(parameter).strip('[]') + '\n'
         self.database.write(line)
 
 

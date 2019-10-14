@@ -157,7 +157,7 @@ class SpotpySetup(object):
 
     def save(self, objectivefunctions, parameter, simulations, chains=None):
         parameter = list(parameter)
-        line = str(objectivefunction) + ',' + str(self.test_objectivefunction) \
+        line = str(objectivefunctions) + ',' + str(self.test_objectivefunction) \
             + ',' + str(parameter).strip('[]') + '\n'
         self.database.write(line)
 

@@ -147,8 +147,8 @@ class SpotpySetup(object):
                             self.cost_func)(evaluation[1], simulation[1])
             else:
                 objectivefunction = - getattr(spotpy.objectivefunctions,
-                                              self.cost_func)(evaluation,
-                                                              simulation)
+                                              self.cost_func)(evaluation[0],
+                                                              simulation[0])
                 test_objectivefunction = \
                     - getattr(spotpy.objectivefunctions,
                               self.cost_func)(evaluation[1], simulation[1])

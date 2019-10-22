@@ -290,9 +290,9 @@ class KineticParams(object):
             factor = CAL_JL
         if convert == 'kcal':
             factor = KCAL_JL
-        self.forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
+        forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
                               np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
-        return self.forward_rates
+        return forward_rates
 
 
 def build_forward_rates(rateconstantlist, temp, convert='cal'):
@@ -316,13 +316,17 @@ def build_forward_rates(rateconstantlist, temp, convert='cal'):
                         the reactions
     """
     rate_constants = []
+    params_list = []
     file = open(rateconstantlist, 'r')
     for line in file:
         f_params = KineticParams()
         params = f_params.get_forward_rate_parameters(line)
+        params_list.append(params)
         rate_constants.append(f_params.get_forward_rate_constants(params, temp, convert))
     file.close()
-    return rate_constants
+    params_list = np.asarray(params_list)
+    params_list = np.asfarray(params_list, float)
+    return rate_constants, params_list
 
 
 def update_rate_constants_for_pressure(chemkin_data, rate_constants, temp):

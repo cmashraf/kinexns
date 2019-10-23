@@ -11,12 +11,11 @@ class ParamOptimize(object):
     def __init__(self, reaction_list, opt_type, sp_indices, ini_val,
                  opt_dist, cost_function, forward_rate, rateconstant_file,
                  energy_file, matrix, species_list, initial_y,
-                 final_t, third_body, algorithm, temper, opt_species='all',
+                 final_t, third_body, algorithm, temper, energy_conv, opt_species='all',
                  chemkin_data=None, smiles=None, factor=0.001, pos=1):
 
         self.reac_list = reaction_list
-        self.parameternames = create_parameter_name_list(self.reac_list,
-                                                         opt_type)
+        self.parameternames = create_parameter_name_list(self.reac_list, opt_type)
         self.speciesnames = opt_species
         self.cost_func = cost_function
         self.dim = len(self.parameternames)
@@ -39,6 +38,7 @@ class ParamOptimize(object):
         self.chemkin_data = chemkin_data
         self.smiles = smiles
         self.factor = factor
+        self.conv = energy_conv
         self.test_species = [item for item in self.species_list if
                              item not in self.speciesnames]
         file_name = str(pos) + '_' + '{}.csv'.format(self.algorithm)
@@ -48,24 +48,17 @@ class ParamOptimize(object):
         for i in range(len(self.reac_list)):
             if opt_type == 'params':
                 self.params.append(spotpy.parameter.Uniform
-                                   (self.parameternames[3 * i], ini_val[0],
-                                    ini_val[1], ini_val[2], ini_val[3]))
+                                   (self.parameternames[3 * i], ini_val[0], ini_val[1], ini_val[2], ini_val[3]))
                 self.params.append(spotpy.parameter.Uniform
-                                   (self.parameternames[3 * i + 1],
-                                    ini_val[0], ini_val[1], ini_val[2],
-                                    ini_val[3]))
+                                   (self.parameternames[3 * i + 1], ini_val[0], ini_val[1], ini_val[2], ini_val[3]))
                 self.params.append(spotpy.parameter.Uniform
-                                   (self.parameternames[3 * i + 2],
-                                    ini_val[0], ini_val[1], ini_val[2],
-                                    ini_val[3]))
+                                   (self.parameternames[3 * i + 2], ini_val[0], ini_val[1], ini_val[2], ini_val[3]))
             else:
                 self.params.append(spotpy.parameter.Uniform
-                                   (self.parameternames[i], ini_val[0],
-                                    ini_val[1], ini_val[2], ini_val[3]))
+                                   (self.parameternames[i], ini_val[0], ini_val[1], ini_val[2], ini_val[3]))
         print(self.parameternames)
-        self.opt_obs, self.opt_test_obs = \
-            get_flatten_data(self.speciesnames, self.test_species, self.opt_dist,
-                             self.temp, self.sp_indices)
+        self.opt_obs, self.opt_test_obs = get_flatten_data(self.speciesnames, self.test_species, self.opt_dist,
+                                                           self.temp, self.sp_indices)
 
     def parameters(self):
         return spotpy.parameter.generate(self.params)
@@ -80,8 +73,7 @@ class ParamOptimize(object):
         if self.opt_type == 'params':
             x = x.reshape(len(self.reac_list), 3)
             for i, number in enumerate(self.reac_list):
-                forward_rate_params[number] = \
-                    np.multiply(forward_rate_params[number], x[i])
+                forward_rate_params[number] = np.multiply(forward_rate_params[number], x[i])
         #             forward_rate_params[number][1] = forward_rate_params[number][1] * x[3*i+1]
         #             forward_rate_params[number][2] = forward_rate_params[number][2] * x[3*i+2]
 
@@ -91,8 +83,7 @@ class ParamOptimize(object):
         for temp in np.array(temp_array):
             if self.opt_type == 'params':
                 forward_rate_val = \
-                    [a[0] * temp ** a[1] * np.exp((- a[2]) *
-                     self.factor / (GAS_CONST * temp))
+                    [a[0] * temp ** a[1] * np.exp((- a[2]) * self.conv / (GAS_CONST * temp))
                      for a in forward_rate_params]
             else:
                 for i, parm in enumerate(self.reac_list):
@@ -103,9 +94,8 @@ class ParamOptimize(object):
                 chemkin = True
                 free_energy_dict = generate_thermo_dict(self.energy,
                                                         self.smiles, temp)
-                forward_rate_val = \
-                    update_rate_constants_for_pressure(self.chemkin_data,
-                                                       forward_rate_val, temp)
+                forward_rate_val = update_rate_constants_for_pressure(self.chemkin_data,
+                                                                      forward_rate_val, temp)
             else:
                 chemkin = False
                 free_energy_dict = build_free_energy_dict(self.energy, temp)
@@ -117,14 +107,10 @@ class ParamOptimize(object):
 
             time, sims = stiff_ode_solver(self.matrix, self.initial_y,
                                           forward_rate_val, rev_rate,
-                                          self.third_body,
-                                          sim_time=self.t_final,
-                                          num_data_points=100)
+                                          self.third_body, sim_time=self.t_final, num_data_points=100)
             sim_res.append(sims)
 
-        results, test_results = get_flatten_data(self.speciesnames,
-                                                 self.test_species,
-                                                 sim_res, self.temp,
+        results, test_results = get_flatten_data(self.speciesnames, self.test_species, sim_res, self.temp,
                                                  self.sp_indices)
 
         simulations = [i / (0.1 * j) if j > 0.0 else i
@@ -173,9 +159,8 @@ class ParamOptimize(object):
 
     def save(self, objectivefunctions, parameter, simulations, chains=None):
         parameter = list(parameter)
-        line = str(objectivefunctions) + ',' + \
-            str(self.test_objectivefunction) + ',' + \
-            str(parameter).strip('[]') + '\n'
+        line = str(objectivefunctions) + ',' + str(self.test_objectivefunction) \
+               + ',' + str(parameter).strip('[]') + '\n'
         self.database.write(line)
 
 
@@ -221,18 +206,16 @@ def optimization(pos, rep, reaction_list, opt_type, sp_indices, ini_val,
                  opt_dist, cost_function, forward_rate, rate_file,
                  energy_file, matrix, species_list, initial_y,
                  final_t, algorithm, temper, opt_species, third_body,
-                 factor=0.001, chemkin_data=None, smiles=None):
+                 factor=0.001, chemkin_data=None, smiles=None, energy_conv=4.184):
     print(algorithm)
     parallel = "seq"
     dbformat = "custom"
     timeout = 1e6
-    spot_setup = ParamOptimize(reaction_list, opt_type, sp_indices, ini_val,
-                               opt_dist, cost_function, forward_rate,
-                               rate_file, energy_file, matrix,
+    spot_setup = ParamOptimize(reaction_list, opt_type, sp_indices, ini_val, opt_dist, cost_function,
+                               forward_rate, rate_file, energy_file, matrix,
                                species_list, initial_y, final_t, third_body,
-                               algorithm, temper, opt_species,
-                               factor=factor, chemkin_data=chemkin_data,
-                               smiles=smiles, pos=pos)
+                               algorithm, temper, energy_conv, opt_species,
+                               factor=factor, chemkin_data=chemkin_data, smiles=smiles, pos=pos)
 
     sampler = getattr(spotpy.algorithms, algorithm)(spot_setup,
                                                     dbformat=dbformat)
@@ -252,7 +235,7 @@ def multi_optimization(processes, rep, reac_list, opt_type, sp_indices,
                        rate_file, energy_file, matrix, species_list,
                        initial_y, final_t, algorithms, temper,
                        opt_species='all', third_body=None,
-                       chemkin_data=None, smiles=None, factor=0.001):
+                       chemkin_data=None, smiles=None, factor=0.001, energy_conv=4.184):
     print(processes)
     pool = mp.Pool(processes=processes)
     results = [pool.apply_async
@@ -262,7 +245,7 @@ def multi_optimization(processes, rep, reac_list, opt_type, sp_indices,
                                     matrix, species_list, initial_y,
                                     final_t, third_body, al, temper,
                                     opt_species, factor,
-                                    chemkin_data, smiles))
+                                    chemkin_data, smiles, energy_conv))
                for (pos, al) in enumerate(algorithms)]
     results = [p.get() for p in results]
     results.sort()  # to sort the results by input window width

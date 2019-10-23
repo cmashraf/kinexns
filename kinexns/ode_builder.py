@@ -237,6 +237,31 @@ def build_third_body_mat(chemkin_data, complete_list, species_list):
     return third_body
 
 
+def get_forward_rate_constants(parameters, temp, convert):
+    """
+    Generating the forward rate constants for each reaction
+    Parameters:
+    ____________
+    parameters          : list
+                        A list of Arrhenius paramters
+    T                   : float, temperature
+    convert             : str
+                        unit conversion from 'convert' to JL
+    Returns
+    ____________
+    forward_rate_parms  :    list
+                        A list of forward rate constants (k_matrix)
+    """
+    factor = 0
+    if convert == 'cal':
+        factor = CAL_JL
+    if convert == 'kcal':
+        factor = KCAL_JL
+    forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
+                          np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
+    return forward_rates
+
+
 class KineticParams(object):
     """
     This is the kinetic params class, they read the rates constant file,
@@ -270,30 +295,6 @@ class KineticParams(object):
 
         return self.forward_rate_params
 
-    def get_forward_rate_constants(self, parameters, temp, convert):
-        """
-        Generating the forward rate constants for each reaction
-        Parameters:
-        ____________
-        parameters          : list
-                            A list of Arrhenius paramters
-        T                   : float, temperature
-        convert             : str
-                            unit conversion from 'convert' to JL
-        Returns
-        ____________
-        forward_rate_parms  :    list
-                            A list of forward rate constants (k_matrix)
-        """
-        factor = 0
-        if convert == 'cal':
-            factor = CAL_JL
-        if convert == 'kcal':
-            factor = KCAL_JL
-        forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
-                              np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
-        return forward_rates
-
 
 def build_forward_rates(rateconstantlist, temp, convert='cal'):
     """
@@ -322,7 +323,7 @@ def build_forward_rates(rateconstantlist, temp, convert='cal'):
         f_params = KineticParams()
         params = f_params.get_forward_rate_parameters(line)
         params_list.append(params)
-        rate_constants.append(f_params.get_forward_rate_constants(params, temp, convert))
+        rate_constants.append(get_forward_rate_constants(params, temp, convert))
     file.close()
     params_list = np.asarray(params_list)
     params_list = np.asfarray(params_list, float)

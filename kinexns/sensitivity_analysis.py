@@ -310,7 +310,7 @@ def draw_top_reactions(path, species, completelist, number=5, save_image='yes'):
     if save_image:
         save_top_reactions(path, reaction_numbers, species, completelist)
 
-    plot_sensitivity_results(df_top)
+    #plot_sensitivity_results(df_top)
 
 
 #        print(reaction)

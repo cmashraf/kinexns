@@ -157,6 +157,10 @@ def stiff_ode_solver(matrix, y_initial, forward_rate,
             print("next process started")
             atol = atol * 1e-2
             exp_sim.atol = atol
+            if atol< 1e-15:
+                t1 = 0
+                y1 = 0
+                break
             # print(exp_sim.atol)
 
     return t1, y1

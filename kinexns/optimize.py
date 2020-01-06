@@ -46,7 +46,7 @@ class ParamOptimize(object):
 
         # generate parameter sets for the given parameters
         for i in range(len(self.reac_list)):
-            if opt_type == 'params':
+            if self.opt_type == 'params':
                 self.params.append(spotpy.parameter.Uniform
                                    (self.parameternames[3 * i], ini_val[0], ini_val[1], ini_val[2], ini_val[3]))
                 self.params.append(spotpy.parameter.Uniform
@@ -56,7 +56,6 @@ class ParamOptimize(object):
             else:
                 self.params.append(spotpy.parameter.Uniform
                                    (self.parameternames[i], ini_val[0], ini_val[1], ini_val[2], ini_val[3]))
-        print(self.parameternames)
         self.opt_obs, self.opt_test_obs = get_flatten_data(self.speciesnames, self.test_species, self.opt_dist,
                                                            self.temp, self.sp_indices)
 
@@ -69,7 +68,7 @@ class ParamOptimize(object):
 
         forward_rate_val = self.forward_rates[0].copy()
         forward_rate_params = self.forward_rates[1].copy()
-
+        # forward_rate_params[:,0] = np.log(forward_rate_params[:,0])
         if self.opt_type == 'params':
             x = x.reshape(len(self.reac_list), 3)
             for i, number in enumerate(self.reac_list):
@@ -80,10 +79,10 @@ class ParamOptimize(object):
         sim_res = []
         temp_array = [self.temp]
         temp_array = np.array(temp_array).flatten()
-        for temp in np.array(temp_array):
+        for ind, temp in enumerate(np.array(temp_array)):
             if self.opt_type == 'params':
                 forward_rate_val = \
-                    [a[0] * temp ** a[1] * np.exp((- a[2]) * self.conv / (GAS_CONST * temp))
+                    [np.exp(a[0]) * temp ** a[1] * np.exp((- a[2]) * self.conv / (GAS_CONST * temp))
                      for a in forward_rate_params]
             else:
                 for i, parm in enumerate(self.reac_list):
@@ -108,6 +107,9 @@ class ParamOptimize(object):
             time, sims = stiff_ode_solver(self.matrix, self.initial_y,
                                           forward_rate_val, rev_rate,
                                           self.third_body, sim_time=self.t_final, num_data_points=100)
+            
+            if time == 0:
+                sims = self.opt_dist[ind] * 5.0
             sim_res.append(sims)
 
         results, test_results = get_flatten_data(self.speciesnames, self.test_species, sim_res, self.temp,
@@ -207,7 +209,7 @@ def optimization(pos, rep, reaction_list, opt_type, sp_indices, ini_val,
                  energy_file, matrix, species_list, initial_y,
                  final_t, algorithm, temper, opt_species, third_body,
                  factor=0.001, chemkin_data=None, smiles=None, energy_conv=4.184):
-    print(algorithm)
+    print(sp_indices)
     parallel = "seq"
     dbformat = "custom"
     timeout = 1e6
@@ -243,8 +245,7 @@ def multi_optimization(processes, rep, reac_list, opt_type, sp_indices,
                                     ini_val, opt_dist, cost_function,
                                     forward_rate, rate_file, energy_file,
                                     matrix, species_list, initial_y,
-                                    final_t, third_body, al, temper,
-                                    opt_species, factor,
+                                    final_t, al, temper, opt_species, third_body, factor,
                                     chemkin_data, smiles, energy_conv))
                for (pos, al) in enumerate(algorithms)]
     results = [p.get() for p in results]

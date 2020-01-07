@@ -30,4 +30,4 @@ opts = dict(name="kinexns",
 
 
 if __name__ == '__main__':
-    setup(install_requires=['numpy', 'pandas', 'spotpy'])
+    setup(install_requires=['numpy', 'pandas', 'spotpy', 'matplotlib'])

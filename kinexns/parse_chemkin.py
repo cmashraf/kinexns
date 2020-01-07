@@ -283,7 +283,39 @@ def write_reactions(string, smiles, file_reaction, file_rate_cons):
     file_rate_cons.write(s2[-3] + ' ' + s2[-2] + ' ' + s2[-1] + '\n')
 
 
-def parse_pr_three_body_data(line_data, k_low, troe_value, three_body_eff, low_count, troe_count, smiles):
+def parse_pr_three_body_data(line_data, k_low, troe_value,
+                             three_body_eff, low_count,
+                             troe_count, smiles):
+    """
+    This function reads all the lines in the  reaction file and
+    seperates the lines of the pressure dependent reactions and their
+    parameter values from there.
+    Parameters
+    ---------------
+    line_data       : str
+                    each line of the reaction file
+    k_low           : array
+                    parameters to calculate the klow values
+                    for the pressure dependent reactions
+    troe_value      : array
+                    values to calculate Troe falloff function
+    three_body_eff  : array of dictionaries
+                    values of third body effiviecy of different species
+                    for the reactions those have third body efficiency
+    low_count       : int
+                    number of reactions having klow values
+    troe_count      : int
+                    number of reactions dependent on troe function
+    smiles          : dict
+                    smiles dictionary of all the molecules
+    Returns
+    ---------------
+    Updated values of k_low, troe_value, three_body_eff,
+    low_count, troe_count
+    This function gets called for each line of the chemkin reaction file
+    and hence all the parameters get updated periodically
+    """
+
     if any(item in line_data for item in ['/', 'LOW', 'TROE']):
         if 'LOW' in line_data:
             low_count = low_count + 1
@@ -296,9 +328,11 @@ def parse_pr_three_body_data(line_data, k_low, troe_value, three_body_eff, low_c
                 troe_count = troe_count + 1
             s = line_data.split()
             if len(s) == 6:
-                troe_value.append([float(s[1]), float(s[2]), float(s[3]), float(s[4])])
+                troe_value.append([float(s[1]), float(s[2]),
+                                   float(s[3]), float(s[4])])
             else:
-                troe_value.append([float(s[1]), float(s[2]), float(s[3]), 1e10])
+                troe_value.append([float(s[1]), float(s[2]),
+                                   float(s[3]), 1e10])
         else:
             s = line_data.split()
             keys = [s[i].split('/')[0] for i in range(len(s))]

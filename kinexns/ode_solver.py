@@ -111,11 +111,7 @@ def stiff_ode_solver(matrix, y_initial, forward_rate,
         #            print(len(third_body_matrix))
         rate_concentration = (kf * np.prod(np.power(y, mat_reac), axis=1)
                               - kr * np.prod(np.power(y, mat_prod), axis=1))
-        # for i in range(len(species_list)):
-        #     temp_value = matrix[:, i] * rate_concentration
-        #
-        #     dydt[i] = np.sum(third_body_eff * temp_value)
-        #        print(y.min())
+
         dydt = np.dot(third_body_eff,
                       np.multiply(matrix, rate_concentration.reshape
                                   (matrix.shape[0], 1)))
@@ -140,24 +136,18 @@ def stiff_ode_solver(matrix, y_initial, forward_rate,
     exp_sim.maxh = 0.1
     exp_sim.minh = 1e-18
     exp_sim.num_threads = 1
-#    print(exp_sim.num_threads)
-    #     exp_sim.display_progress = True
-    #     exp_sim.linear_solver = "DENSE"
-    # Simulate
-#    t1, y1 = exp_sim.simulate(sim_time, num_data_points)
+
     while True:
         try:
             t1, y1 = exp_sim.simulate(sim_time, num_data_points)
-        # text_trap = io.StringIO()
-        # if 'Warning' in text_trap:
-        #     print('warning')
-        #     raise CVodeWarning
             break
         except CVodeError:
+            # reduce absolute error by two orders of magnitude
+            # and try to solve again.
             print("next process started")
             atol = atol * 1e-2
             exp_sim.atol = atol
-            if atol< 1e-15:
+            if atol < 1e-15:
                 t1 = 0
                 y1 = 0
                 break

@@ -8,6 +8,33 @@ import matplotlib.pyplot as plt
 
 
 def gen_params(sample_number, sa_path, input_file_name, output_file_name):
+    """
+    Generate the parameter sets for the Sobol sensitivity analysis.
+    Saves a file with the information required for the analysis
+    that will be performed later.
+    Parameters
+    -------------
+    sample_number   : number of samples to be generated. Total of parameters
+                    generated will be N * (2D+2) where N = sample number and
+                    D = number of parameters to vary which is listed in
+                    input_file_name
+    sa_path         : path of the files to read and write from
+    input_file_name : name of the input file located at sa_path. This file
+                    should have three columns - parameter name, lower limit
+                    and upper limit
+    output_file_name    : name at the output file where the parameter
+                        combiantions should be writtten located at
+                        sa_path
+    Returns
+    --------
+    param_sets      : numpy ndarray written at output_file_name
+                    an ndarray where each row is one set of parameter
+                    values.  You must run your model (in whatever environment
+                    is appropriate) with each of the sets of parameters from
+                    this array.  The output must be stored in the same order
+                    as given in this parameter set array (one row of results
+                    for each row of parameters).
+    """
 
     input_file = sa_path + input_file_name
     output_file = sa_path + output_file_name
@@ -45,7 +72,8 @@ def analyze_sensitivity(path, column, delimiter, order, name,
                  of processors to use.
     Returns
     --------
-    None
+    A file named as 'analysis_{}.txt with sensitivity analysis results
+    for that output measure.
     """
     out_file = path + 'analysis_{}.txt' .format(name)
     params_file = path + 'params.txt'
@@ -65,7 +93,7 @@ def analyze_sensitivity(path, column, delimiter, order, name,
 def default_draw_options():
     """
    This function returns an RDKit drawing options object with
-   default drawing options.
+   default drawing options. No argument needed
     """
 
     opts = Draw.DrawingOptions()
@@ -80,6 +108,21 @@ def mol_to_image(mol, max_size=(1000, 1000), kekulize=True, options=None,
                  canvas=None, **kwargs):
     """
     Wrapper for RDKit's MolToImage. If mol == None, an arrow is drawn
+    Parameters
+    -----------
+    mol     : str
+            the smiles string of the molecule to be drawn.
+            If mol == None, an arrow is drawn.
+    max_size    : tuple
+                maximum size in pixel of the image to be drawn
+                default (1000, 1000)
+    kekulize    : boolean
+                run kekulization routine on input mol (default True)
+    options     : None
+    canvas      : None
+    Returns
+    --------------
+    A rdkit image of the molecule
     """
 
     if not options:
@@ -125,7 +168,7 @@ def mol_to_image(mol, max_size=(1000, 1000), kekulize=True, options=None,
 def trim_img_by_white(img, padding=0):
     """
     This function takes a PIL image, img, and crops it to the minimum rectangle
-            based on its whiteness/transparency. 5 pixel padding used automatically.
+    based on its whiteness/transparency. 5 pixel padding used automatically.
     """
 
 #   Convert to array
@@ -179,8 +222,8 @@ def stitch_pils_horizontally(imgs):
 def stitch_pils_vertically(imgs):
     """
     This function takes a list of PIL images and concatenates
-    them onto a new image horizontally, with each one
-    vertically centered.
+    them onto a new image vertically, with each one
+    horizontally centered.
     """
 
 # Create blank image (def: transparent white)
@@ -206,8 +249,20 @@ def reaction_to_image(rxn, kekulize=True,
     Modification of RDKit's ReactionToImage to allow for each molecule
     to have a different drawn size. rxn is an RDKit reaction object
     warning: this function adds hydrogens as it sees fit
+    Parameters
+    ------------
+    rxn     : str
+             A raction string generated from build reaction function
+    kekulize   : boolean
+                run kekulization routine on input mol (default True)
+    options     : None
+    Returns
+    --------
+    rdkit images of the reactions generated using three separate functions
+    trim_img_by_white, mol_to_image and stitch_pils_horizontally
     """
-# Extract mols from reaction
+
+    # Extract mols from reaction
     mols = []
     for item in rxn:
         if item == '':
@@ -225,6 +280,40 @@ def reaction_to_image(rxn, kekulize=True,
 
 
 def parse_sa_analysis(path):
+    """"
+    This function reads and processes all the sensitivity analysis results
+    in a specified folder and returns a dictionary with the corresponding
+    dataframes for first/total order sensitivity indices and second order
+    indices (if present).
+    Sensitivity analysis results should be in the default SALib output
+    format and must start with the word 'analysis'.
+    Parameters
+    -----------
+    path : str, optional
+           String containing the relative or absolute path of the directory
+           where analysis_*.txt files are stored.  There cannot be any
+           files or folders within this directory that start with 'analysis'
+           except those generated by the SALib sensitivity analysis.  All
+           `analysis*` files in this path should correspond to outputs from
+           one sensitivity analysis project, and if second order sensitivity
+           indices are included in any of the files they should be present in
+           all the others.
+    Returns
+    --------
+    sens_dfs : dict
+               Dictionary where keys are the names of the various output
+               measures (one output measure per analysis file in the folder
+               specified by path).  Dictionary values are a list of pandas
+               dataframes.
+               sens_dfs['key'][0] is a dataframe with the first and total
+               order indices of all the parameters with respect to the "key"
+               output variable.
+               sens_dfs['key'][1] is a dataframe with the second order
+               indices for pairs of parameters (if second order indices are
+               present in the analysis file).  If there are no second order
+               results in the analysis file then this value is a boolean,
+               False.
+    """
 
     filenames = [filename for filename in os.listdir(
                      path) if filename.startswith('analysis')]
@@ -265,6 +354,33 @@ def parse_sa_analysis(path):
 
 
 def get_top_ones(path, species, coeff='total', number=5):
+    """
+    This function returns the top five reactions with highest absolute
+    sensitivity index values.
+    Parameters
+    -----------
+    path    : str, optional
+            String containing the relative or absolute path of the directory
+            where analysis_*.txt files are stored.  There cannot be any
+            files or folders within this directory that start with 'analysis'
+            except those generated by the SALib sensitivity analysis.  All
+            analysis*` files in this path should correspond to outputs from
+            one sensitivity analysis project, and if second order sensitivity
+            indices are included in any of the files they should be present in
+            all the others.
+    species : str
+            name of the species/measurable output on whom the analysis will
+            be performed
+    coeff   : str
+            default total to perform the analysis on total sensitivity index.
+            give any other string to do it on first order index
+    number  : int
+            find the n number of reactions with highest sensitivity indices
+    Returns
+    -----------
+    df      : dataframe
+            a dataframe with reaction number and sensitivity indices
+    """
 
     sens_dfs = parse_sa_analysis(path)
 
@@ -288,6 +404,23 @@ def get_top_ones(path, species, coeff='total', number=5):
 
 
 def build_reaction(reac):
+    """
+    This function gets the reactants and products in smiles format
+    from reaction list and writes the reaction in a way that
+    can be fed to rdkit.
+    Parameters
+    ------
+    reac    : str
+            A reaction string with reactants/products and their
+            stoichiometric coeffs. Typically an entry from complete
+            reaction list
+    Returns
+    --------------
+    reaction_list   : str
+                    list of reactants and products of a specific reaction
+                    seperated by space
+    """
+
     reactants = []
     products = []
     for species in reac:
@@ -302,27 +435,69 @@ def build_reaction(reac):
     return reaction_list
 
 
-def draw_top_reactions(path, species, completelist, number=5, save_image='yes'):
-    df_top = get_top_ones(path, species, number)
+def draw_top_reactions(path, species, complete_list,
+                       number=5, save_image='yes'):
+    """
+    This function draws the top n reactions with highest sensitivity indices
+    with the help of rdkit so that the user can visualize what are the most
+    sensitive reactions.
+    Parameters
+    ------------
+    path        : str
+                the file path where all the files generated from
+                sensitivity analysis are stored.
+    species     : str
+                name of the species or output measure on which sensitivy
+                analysis will be performed
+    complete_list    : list
+                      A list of all the reactions with reactant and
+                      product species and their stoichiometric coeffs
+    number      : int
+                now many reactions to draw, default = 5
+    save_image  : boolean
+                to save the image in a .png file
+    Returns
+    ------------------
+    A png file with all the reactions
+    """
+    df_top = get_top_ones(path, species, number=number)
     parameters = df_top.Parameter.values
     reaction_numbers = [int(parameters[i][1:]) for i in range(number)]
 
     if save_image:
-        save_top_reactions(path, reaction_numbers, species, completelist)
+        save_top_reactions(path, reaction_numbers, species, complete_list)
 
-    #plot_sensitivity_results(df_top)
+    # plot_sensitivity_results(df_top)
 
 
 #        print(reaction)
 #    return rxn_strings
 
 
-def save_top_reactions(image_path, reactions, species, completelist):
-
+def save_top_reactions(image_path, reactions, species, complete_list):
+    """
+    This function save the reactions drawn using rdkit in a png file
+    Parameters
+    -------------
+    image_path  : str
+                the file path where all the files generated from
+                sensitivity analysis are stored.
+    reactions   : list
+                A list of reaction numbers to be drawn
+    species     : str
+                name of the species or output measure on which sensitivy
+                analysis will be performed
+    complete_list    : list
+                      A list of all the reactions with reactant and
+                      product species and their stoichiometric coeffs
+    Returns
+    ------------------
+    A png file with all the reactions
+    """
     rxn_strings = []
 
     for number in reactions:
-        reaction = completelist[number]
+        reaction = complete_list[number]
         rxn_strings.append(build_reaction(reaction))
 
     #    rxns = [ChemReac.ReactionFromSmarts(rxn_str) for rxn_str in rxn_strings]
@@ -335,6 +510,20 @@ def save_top_reactions(image_path, reactions, species, completelist):
 
 
 def plot_sensitivity_results(df, coeff='total'):
+    """
+    Draw a bar plot for the reactiions with highest sensitivity indices.
+    Parameters
+    --------------
+    df          : dataframe
+                The dataframe generated using the function 'get_top_reactions'
+    coeff       : str
+                plot sensitivity indices calculated using total
+                sensitivity analysis. Default is total, use any other
+                string to do it foe first order
+    Returns
+    ---------------
+    A bar plot in the screen.
+    """
 
     parameter = list(df.Parameter)
     if coeff == 'total':

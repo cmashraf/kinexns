@@ -2,20 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/reaction_chemkin.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/reaction_chemkin.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/data/1.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/data/faravelli_rateconstantlist.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/data/faravelli_reactionlist.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/data/r.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/data/rates_and_ODEs.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/kinexns/ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/ode_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/ode_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/ode_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/parse_chemkin.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/parse_chemkin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/sensitivity_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/sensitivity_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kinexns/optimize.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/optimize.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

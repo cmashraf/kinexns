@@ -155,7 +155,11 @@ def build_species_list(reaction_file):
 
     species_list.sort()
     file.close()
-    return reactant_list, product_list, species_list
+    complete_list = [react + prod for react, prod in zip
+                     (reactant_list, product_list)]
+    species_indices = {species_list[i]: i for i in
+                       range(0, len(species_list))}
+    return complete_list, species_indices, species_list
 
 
 def update_eff_dict(chemkin_data, species_list):
@@ -257,6 +261,10 @@ def get_forward_rate_constants(parameters, temp, convert):
         factor = CAL_JL
     if convert == 'kcal':
         factor = KCAL_JL
+    if convert == 'KJ':
+        factor = 1000
+    if convert == 'J':
+        factor = 1
     forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
                           np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
     return forward_rates
@@ -444,7 +452,7 @@ def build_stoic_matrix(complete_list, species_list, indices_species):
     for rxnindex, reac_list in enumerate(complete_list):
         rate = build_rate(reac_list, species_list, matrix, rxnindex, indices_species)
         rate_final.append(rate)
-    return matrix, rate_final
+    return matrix
 
 
 def build_free_energy_change(free_energy, species_list, stoic_mat, factor, chemkin=True):
@@ -465,7 +473,7 @@ def build_free_energy_change(free_energy, species_list, stoic_mat, factor, chemk
     stoic_mat           : nampy array
                         stoichiometric matrix of the mechanism
     factor              : float
-                        conversion factor from given unit of energy to kJ
+                        conversion factor from given unit of energy to J
     chemkin             : bool
                         indicates if chemkin files are read as input files
                         default = True
@@ -517,7 +525,7 @@ def build_reverse_rates(free_energy, species_list, stoic_mat,
     stoic_mat           : nampy array
                         stoichiometric matrix of the mechanism
     factor              : float
-                        conversion factor from given unit of energy to kJ
+                        conversion factor from given unit of energy to J
     chemkin             : bool
                         indicates if chemkin files are read as input files
                         default = True
@@ -533,7 +541,7 @@ def build_reverse_rates(free_energy, species_list, stoic_mat,
     gibbs_energy = build_free_energy_change(free_energy, species_list,
                                             stoic_mat, factor, chemkin=True)
     change_mol = stoic_mat.sum(axis=1, dtype=float)
-    equilibrium_constants = [np.exp(-n * 1000 / (GAS_CONST * temp))
+    equilibrium_constants = [np.exp(-n / (GAS_CONST * temp))
                              for n in gibbs_energy]
     #    print(forward_rates)
     reverse_rates = [(a / b) * (GAS_CONST * temp * 1000 / PR_ATM) ** c

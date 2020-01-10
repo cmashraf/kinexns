@@ -12,7 +12,7 @@ class ParamOptimize(object):
                  opt_dist, cost_function, forward_rate, rateconstant_file,
                  energy_file, matrix, species_list, initial_y,
                  final_t, third_body, algorithm, temper, energy_conv, opt_species='all',
-                 chemkin_data=None, smiles=None, factor=0.001, pos=1):
+                 chemkin_data=None, smiles=None, factor=1, pos=1):
 
         self.reac_list = reaction_list
         self.parameternames = create_parameter_name_list(self.reac_list, opt_type)
@@ -208,7 +208,7 @@ def optimization(pos, rep, reaction_list, opt_type, sp_indices, ini_val,
                  opt_dist, cost_function, forward_rate, rate_file,
                  energy_file, matrix, species_list, initial_y,
                  final_t, algorithm, temper, opt_species, third_body,
-                 factor=0.001, chemkin_data=None, smiles=None, energy_conv=4.184):
+                 factor=1, chemkin_data=None, smiles=None, energy_conv=4.184):
     print(sp_indices)
     parallel = "seq"
     dbformat = "custom"
@@ -237,7 +237,7 @@ def multi_optimization(processes, rep, reac_list, opt_type, sp_indices,
                        rate_file, energy_file, matrix, species_list,
                        initial_y, final_t, algorithms, temper,
                        opt_species='all', third_body=None,
-                       chemkin_data=None, smiles=None, factor=0.001, energy_conv=4.184):
+                       chemkin_data=None, smiles=None, factor=1, energy_conv=4.184):
     print(processes)
     pool = mp.Pool(processes=processes)
     results = [pool.apply_async

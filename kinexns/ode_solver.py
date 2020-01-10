@@ -8,7 +8,8 @@ import io
 from assimulo.solvers.sundials import CVodeError
 
 
-def initial_condition(species_list, indices_species, species_smile, concentration):
+def initial_condition(species_list, indices_species,
+                      species_smile, concentration):
     """
     Sets up the initial condition for solving the odes
     Parameters
@@ -147,10 +148,10 @@ def stiff_ode_solver(matrix, y_initial, forward_rate,
             print("next process started")
             atol = atol * 1e-2
             exp_sim.atol = atol
-            if atol < 1e-15:
-                t1 = 0
-                y1 = 0
-                break
+            # if atol < 1e-15:
+            #     t1 = 0
+            #     y1 = 0
+            #     break
             # print(exp_sim.atol)
 
     return t1, y1

@@ -539,13 +539,13 @@ def build_reverse_rates(free_energy, species_list, stoic_mat,
                          A list of reverse rate constants
     """
     gibbs_energy = build_free_energy_change(free_energy, species_list,
-                                            stoic_mat, factor, chemkin=True)
+                                            stoic_mat, factor, chemkin=chemkin)
     change_mol = stoic_mat.sum(axis=1, dtype=float)
     equilibrium_constants = [np.exp(-n / (GAS_CONST * temp))
                              for n in gibbs_energy]
     #    print(forward_rates)
     reverse_rates = [(a / b) * (GAS_CONST * temp * 1000 / PR_ATM) ** c
-                     for (a, b, c) in
+                     if c < 3 else 0 for (a, b, c) in
                      zip(forward_rates, equilibrium_constants, change_mol)]
 
     return reverse_rates

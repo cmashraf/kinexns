@@ -176,10 +176,10 @@ def trim_img_by_white(img, padding=0):
 #    print(as_array)
 
 # Set previously-transparent pixels to white
-    as_array[as_array[:, :, 3] == 0] = [255, 255, 255, 255]
+    # as_array[as_array[:, :, 3] == 0] = [255, 255, 255]
 
 # Content defined as non-white and non-transparent pixel
-    has_content = np.sum(as_array, axis=2, dtype=np.uint32) != 255 * 4
+    has_content = np.sum(as_array, axis=2, dtype=np.uint32) != 255 * 3
     xs, ys = np.nonzero(has_content)
 
 # Crop down
@@ -509,13 +509,19 @@ def save_top_reactions(image_path, reactions, species, complete_list):
     rxn_image.save(image_path + 'sensitive_reactions_{}.png'.format(species))
 
 
-def plot_sensitivity_results(df, coeff='total'):
+def plot_sensitivity_results(path, species, number=5, coeff='total'):
     """
     Draw a bar plot for the reactiions with highest sensitivity indices.
     Parameters
     --------------
-    df          : dataframe
-                The dataframe generated using the function 'get_top_reactions'
+    path        : str
+                the file path where all the files generated from
+                sensitivity analysis are stored.
+    species     : str
+                name of the species or output measure on which sensitivy
+                analysis will be performed
+    number      : int
+                now many reactions to draw, default = 5
     coeff       : str
                 plot sensitivity indices calculated using total
                 sensitivity analysis. Default is total, use any other
@@ -524,7 +530,7 @@ def plot_sensitivity_results(df, coeff='total'):
     ---------------
     A bar plot in the screen.
     """
-
+    df = get_top_ones(path, species, number=number)
     parameter = list(df.Parameter)
     if coeff == 'total':
         sensitivity = list(df.ST)
@@ -539,7 +545,8 @@ def plot_sensitivity_results(df, coeff='total'):
 
     barwidth = 0.8
 
-    plt.bar(parameter, sensitivity, width=barwidth, color="#962980", edgecolor='black', yerr=confidence, capsize=7)
+    plt.bar(parameter, sensitivity, width=barwidth, color="#962980",
+            edgecolor='black', yerr=confidence, capsize=7)
     plt.ylabel('Sensitivity Index')
     plt.xlabel('Forward Reaction Rates')
 

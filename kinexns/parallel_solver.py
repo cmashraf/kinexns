@@ -37,7 +37,7 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
                     species_smiles.dat file
     t_final        : float
                     final time in seconds
-    factor              : float
+    factor              : str
                         conversion factor from given unit of energy to kJ
     third_body          : ndarray
                         matrix with third body efficiencies
@@ -55,8 +55,8 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
     values = list(map(float, data.split()))
     kf_random[:] = np.array(values[:len(forward_rate)])
     # temp = values[-1] + 273
-    temp = 950.0
-    kf_actual = np.array(build_forward_rates(file_rateconstant, temp))
+    temp = 773
+    kf_actual = np.array(build_forward_rates(file_rateconstant, temp, factor)[0])
     kf_pur = np.array([actual * 10 ** rand for actual,
                        rand in zip(kf_actual, kf_random)])
     kf_purturbed = list(kf_pur)
@@ -70,7 +70,7 @@ def func_solv(data, forward_rate, file_rateconstant, file_energy,
         chemkin = False
         free_energy_dict = build_free_energy_dict(file_energy, temp)
     kr_purturbed = build_reverse_rates(free_energy_dict, species_list, matrix,
-                                       factor, kf_purturbed, temp, chemkin)
+                                       1, kf_purturbed, temp, chemkin)
     mod, sim = stiff_ode_solver(matrix, initial_y, kf_purturbed,
                                 kr_purturbed, third_body=third_body,
                                 sim_time=t_final)
@@ -134,10 +134,10 @@ def serial_ss(file_read, forward_rate, file_rateconstant,
     return results
 
 
-def multiprocess(processes, file_read, forward_rate, file_rateconstant,
-                 file_energy, matrix, species_list, factor,
-                 initial_y, t_final, third_body=None,
-                 chemkin_data=None, smiles=None, chemkin=True):
+def multisolve(processes, file_read, file_write, forward_rate,
+               file_rateconstant, file_energy, matrix, species_list,
+               factor, initial_y, t_final, third_body=None,
+               chemkin_data=None, smiles=None, chemkin=True):
     """
     Iteratively solves the system of ODEs for different rate constants
     generated from the data file in parellel
@@ -148,6 +148,9 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
     file_read       : str
                     path of the 'param_set' file where all
                     the parameter combinations are listed
+    file_write     : str
+                    path/name of the file where all
+                    where the results will be written
     forward_rate   : list
                     A list of forward reaction rates
                     for all the reactions in the mechanism
@@ -171,7 +174,7 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
                     the smiles dictionary generated from
                     species_smiles.dat file
     factor              : float
-                        conversion factor from given unit of energy to kJ
+                        conversion factor from given unit of energy to J
     chemkin             : bool
                         indicates if chemkin files are read as input files
                         default = True
@@ -192,7 +195,8 @@ def multiprocess(processes, file_read, forward_rate, file_rateconstant,
     results = [p.get() for p in results]
     results.sort()  # to sort the results by input window width
     results = [r[1] for r in results]
-    return results
+    write_model_sol(file_write, results)
+    return None
 
 
 def write_model_sol(file_name, res):

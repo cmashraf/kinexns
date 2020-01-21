@@ -222,22 +222,17 @@ def optimization(pos, rep, reaction_list, opt_type, sp_indices, ini_val,
     parallel = "seq"
     dbformat = "custom"
     timeout = 1e6
-    conver = 1
-    if energy_conv == 'kcal':
-        conver = KCAL_JL
-    if energy_conv == 'cal':
-        conver = CAL_JL
-    if energy_conv == 'hartree':
-        conver = HT_JL
-    if energy_conv == 'KJ':
-        conver = 1000
-    if energy_conv == 'J':
-        conver = 1
-    spot_setup = ParamOptimize(reaction_list, opt_type, sp_indices, ini_val, opt_dist, cost_function,
+    convet_val = {'cal': CAL_JL, 'kcal': KCAL_JL,
+                  'hartrees': HT_JL, 'KJ': 1000, 'J': 1}
+    conver = convet_val.get(energy_conv)
+
+    spot_setup = ParamOptimize(reaction_list, opt_type, sp_indices, ini_val,
+                               opt_dist, cost_function,
                                forward_rate, rate_file, energy_file, matrix,
                                species_list, initial_y, final_t, third_body,
                                algorithm, temper, conver, opt_species,
-                               factor=factor, chemkin_data=chemkin_data, smiles=smiles, pos=pos)
+                               factor=factor, chemkin_data=chemkin_data,
+                               smiles=smiles, pos=pos)
 
     sampler = getattr(spotpy.algorithms, algorithm)(spot_setup,
                                                     dbformat=dbformat)

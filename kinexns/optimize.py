@@ -115,8 +115,8 @@ class ParamOptimize(object):
                 sims = self.opt_dist[ind] * 5.0
             sim_res.append(sims)
 
-        if len(temp_array == 1):
-            sim_res = sim_res[0]
+        # if len(temp_array == 1):
+        #     sim_res = sim_res[0]
         results, test_results = get_flatten_data(self.speciesnames, self.test_species, sim_res, self.temp,
                                                  self.sp_indices)
         simulations = [i / (0.1 * j) if j > 0.0 else i
@@ -185,10 +185,10 @@ def get_flatten_data(species, test_species, res, temp, sp_indeices):
             obs.append(np.array(res[i]).flatten())
             test_obs.append(empty)
         else:
-            if len(temp_array == 1):
-                dist = np.array(res)
-            else:
-                dist = np.array(res[i])
+            # if len(temp_array == 1):
+            #     dist = np.array(res)
+            # else:
+            dist = np.array(res[i])
             for sp in species:
                 obs.append(dist[:, sp_indeices[sp]])
             for sp in test_species:
@@ -218,7 +218,10 @@ def optimization(pos, rep, reaction_list, opt_type, sp_indices, ini_val,
                  energy_file, matrix, species_list, initial_y,
                  final_t, algorithm, temper, opt_species, third_body,
                  factor=1, chemkin_data=None, smiles=None, energy_conv='cal'):
-    # print(sp_indices)
+    opt_dist_shape = np.shape(opt_dist)
+    if len(temper) == 1:
+        opt_dist = opt_dist.reshape(1, opt_dist_shape[0], opt_dist_shape[1])
+
     parallel = "seq"
     dbformat = "custom"
     timeout = 1e6
@@ -255,13 +258,15 @@ def multi_optimization(processes, rep, reac_list, opt_type, sp_indices,
                        chemkin_data=None, smiles=None, factor=1, energy_conv='cal'):
     print(processes)
     pool = mp.Pool(processes=processes)
+    temp_array = [temper]
+    temp_array = np.array(temp_array).flatten()
 
     results = [pool.apply_async
                (optimization, args=(pos, rep, reac_list, opt_type, sp_indices,
                                     ini_val, opt_dist, cost_function,
                                     forward_rate, rate_file, energy_file,
                                     matrix, species_list, initial_y,
-                                    final_t, al, temper, opt_species, third_body, factor,
+                                    final_t, al, temp_array, opt_species, third_body, factor,
                                     chemkin_data, smiles, energy_conv))
                for (pos, al) in enumerate(algorithms)]
     results = [p.get() for p in results]

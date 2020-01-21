@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="" />
+    <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/example_chemkin/0_mle.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/example_chemkin/0_mle.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/example_chemkin/1_mcmc.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/example_chemkin/1_mcmc.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/example_chemkin/2_sa.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/example_chemkin/2_sa.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/example_chemkin/3_dds.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/example_chemkin/3_dds.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/example_chemkin/optimization.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/example_chemkin/optimization.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kinexns/ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/ode_builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kinexns/optimize.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/optimize.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,7 +198,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/kinexns/optimize.py</url>
-          <line>231</line>
+          <line>234</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

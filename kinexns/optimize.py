@@ -4,6 +4,8 @@ import multiprocessing as mp
 from .ode_solver import *
 from .ode_builder import *
 from .parse_chemkin import *
+from .constants import KCAL_JL, HT_JL, CAL_JL
+from .constants import GAS_CONST, PR_ATM
 
 
 class ParamOptimize(object):
@@ -11,7 +13,7 @@ class ParamOptimize(object):
     def __init__(self, reaction_list, opt_type, sp_indices, ini_val,
                  opt_dist, cost_function, forward_rate, rateconstant_file,
                  energy_file, matrix, species_list, initial_y,
-                 final_t, third_body, algorithm, temper, energy_conv, opt_species='all',
+                 final_t, third_body, algorithm, temper, conver, opt_species='all',
                  chemkin_data=None, smiles=None, factor=1, pos=1):
 
         self.reac_list = reaction_list
@@ -37,8 +39,7 @@ class ParamOptimize(object):
         # self.pos = pos
         self.chemkin_data = chemkin_data
         self.smiles = smiles
-        self.factor = factor
-        self.conv = energy_conv
+        self.conv = conver
         self.test_species = [item for item in self.species_list if
                              item not in self.speciesnames]
         file_name = str(pos) + '_' + '{}.csv'.format(self.algorithm)
@@ -93,8 +94,8 @@ class ParamOptimize(object):
                 chemkin = True
                 free_energy_dict = generate_thermo_dict(self.energy,
                                                         self.smiles, temp)
-                forward_rate_val = update_rate_constants_for_pressure(self.chemkin_data,
-                                                                      forward_rate_val, temp)
+                forward_rate_val = update_rate_constants_for_pressure(
+                    self.chemkin_data, forward_rate_val, temp)
             else:
                 chemkin = False
                 free_energy_dict = build_free_energy_dict(self.energy, temp)
@@ -106,15 +107,18 @@ class ParamOptimize(object):
 
             time, sims = stiff_ode_solver(self.matrix, self.initial_y,
                                           forward_rate_val, rev_rate,
-                                          self.third_body, sim_time=self.t_final, num_data_points=100)
+                                          self.third_body,
+                                          sim_time=self.t_final,
+                                          num_data_points=100)
             
             if time == 0:
                 sims = self.opt_dist[ind] * 5.0
             sim_res.append(sims)
 
+        if len(temp_array == 1):
+            sim_res = sim_res[0]
         results, test_results = get_flatten_data(self.speciesnames, self.test_species, sim_res, self.temp,
                                                  self.sp_indices)
-
         simulations = [i / (0.1 * j) if j > 0.0 else i
                        for i, j in zip(results, self.opt_obs)]
         test_simulations = [i / (0.1 * j) if j > 0.0 else i for i, j in
@@ -174,12 +178,17 @@ def get_flatten_data(species, test_species, res, temp, sp_indeices):
     obs = []
     test_obs = []
     empty = 0
-    for i in range(len(temp)):
+    temp_array = [temp]
+    temp_array = np.array(temp_array).flatten()
+    for i in range(len(temp_array)):
         if species == 'all':
             obs.append(np.array(res[i]).flatten())
             test_obs.append(empty)
         else:
-            dist = np.array(res[i])
+            if len(temp_array == 1):
+                dist = np.array(res)
+            else:
+                dist = np.array(res[i])
             for sp in species:
                 obs.append(dist[:, sp_indeices[sp]])
             for sp in test_species:
@@ -208,15 +217,26 @@ def optimization(pos, rep, reaction_list, opt_type, sp_indices, ini_val,
                  opt_dist, cost_function, forward_rate, rate_file,
                  energy_file, matrix, species_list, initial_y,
                  final_t, algorithm, temper, opt_species, third_body,
-                 factor=1, chemkin_data=None, smiles=None, energy_conv=4.184):
-    print(sp_indices)
+                 factor=1, chemkin_data=None, smiles=None, energy_conv='cal'):
+    # print(sp_indices)
     parallel = "seq"
     dbformat = "custom"
     timeout = 1e6
+    conver = 1
+    if energy_conv == 'kcal':
+        conver = KCAL_JL
+    if energy_conv == 'cal':
+        conver = CAL_JL
+    if energy_conv == 'hartree':
+        conver = HT_JL
+    if energy_conv == 'KJ':
+        conver = 1000
+    if energy_conv == 'J':
+        conver = 1
     spot_setup = ParamOptimize(reaction_list, opt_type, sp_indices, ini_val, opt_dist, cost_function,
                                forward_rate, rate_file, energy_file, matrix,
                                species_list, initial_y, final_t, third_body,
-                               algorithm, temper, energy_conv, opt_species,
+                               algorithm, temper, conver, opt_species,
                                factor=factor, chemkin_data=chemkin_data, smiles=smiles, pos=pos)
 
     sampler = getattr(spotpy.algorithms, algorithm)(spot_setup,
@@ -237,9 +257,10 @@ def multi_optimization(processes, rep, reac_list, opt_type, sp_indices,
                        rate_file, energy_file, matrix, species_list,
                        initial_y, final_t, algorithms, temper,
                        opt_species='all', third_body=None,
-                       chemkin_data=None, smiles=None, factor=1, energy_conv=4.184):
+                       chemkin_data=None, smiles=None, factor=1, energy_conv='cal'):
     print(processes)
     pool = mp.Pool(processes=processes)
+
     results = [pool.apply_async
                (optimization, args=(pos, rep, reac_list, opt_type, sp_indices,
                                     ini_val, opt_dist, cost_function,

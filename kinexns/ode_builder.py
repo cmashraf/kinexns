@@ -266,7 +266,7 @@ def get_forward_rate_constants(parameters, temp, convert):
     if convert == 'J':
         factor = 1
     forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
-                          np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
+                     np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
     return forward_rates
 
 

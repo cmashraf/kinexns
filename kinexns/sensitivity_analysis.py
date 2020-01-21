@@ -38,7 +38,8 @@ def gen_params(sample_number, sa_path, input_file_name, output_file_name):
 
     input_file = sa_path + input_file_name
     output_file = sa_path + output_file_name
-    os.system('python -m SALib.sample.saltelli -n {} -p {} -o {}'.format(sample_number, input_file, output_file))
+    os.system('python -m SALib.sample.saltelli -n {} -p {} -o '
+              '{}'.format(sample_number, input_file, output_file))
 
 
 def analyze_sensitivity(path, column, delimiter, order, name,
@@ -144,8 +145,8 @@ def mol_to_image(mol, max_size=(1000, 1000), kekulize=True, options=None,
             canvas.save()
         return img
     elif mol is not None:
-        return Draw.MolToImage(mol, size=max_size, kekulize=kekulize, options=options,
-                               canvas=canvas, **kwargs)
+        return Draw.MolToImage(mol, size=max_size, kekulize=kekulize,
+                               options=options, canvas=canvas, **kwargs)
     else:  # retro arrow or error
         sub_img_size = (80, 80)
         (a, b) = sub_img_size
@@ -167,8 +168,9 @@ def mol_to_image(mol, max_size=(1000, 1000), kekulize=True, options=None,
 
 def trim_img_by_white(img, padding=0):
     """
-    This function takes a PIL image, img, and crops it to the minimum rectangle
-    based on its whiteness/transparency. 5 pixel padding used automatically.
+    This function takes a PIL image, img, and crops it to the minimum
+    rectanglebased on its whiteness/transparency.
+    5 pixel padding used automatically.
     """
 
 #   Convert to array
@@ -273,7 +275,8 @@ def reaction_to_image(rxn, kekulize=True,
 
 #    Generate images for all molecules/arrow
     imgs = [trim_img_by_white(mol_to_image(
-            mol, kekulize=kekulize, options=options), padding=5) for mol in mols]
+            mol, kekulize=kekulize, options=options), padding=5)
+            for mol in mols]
 
 # Combine
     return stitch_pils_horizontally(imgs)

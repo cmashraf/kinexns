@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b10890e-0700-41e1-9110-b94b699ac613" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/kmpy.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/kmpy.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/example_xylose/build_solve_model.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/example_xylose/build_solve_model.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kinexns/parallel_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/parallel_solver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kinexns/ode_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/ode_builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kinexns/optimize.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/optimize.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kinexns/sensitivity_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinexns/sensitivity_analysis.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,7 +26,7 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -171,15 +173,6 @@
     <history-entry file="Unittests_for_kmpy_tests_test_ode_builder_TestBuildDYDTList - 2019.05.10 at 18h 40m 51s.xml">
       <configuration name="Unittests for kmpy.tests.test_ode_builder.TestBuildDYDTList" configurationId="tests" />
     </history-entry>
-  </component>
-  <component name="TodoView">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="true" />
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">

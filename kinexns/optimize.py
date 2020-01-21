@@ -222,9 +222,9 @@ def optimization(pos, rep, reaction_list, opt_type, sp_indices, ini_val,
     parallel = "seq"
     dbformat = "custom"
     timeout = 1e6
-    convet_val = {'cal': CAL_JL, 'kcal': KCAL_JL,
-                  'hartrees': HT_JL, 'KJ': 1000, 'J': 1}
-    conver = convet_val.get(energy_conv)
+    convert_val = {'cal': CAL_JL, 'kcal': KCAL_JL,
+                   'hartrees': HT_JL, 'KJ': 1000, 'J': 1}
+    conver = convert_val.get(energy_conv)
 
     spot_setup = ParamOptimize(reaction_list, opt_type, sp_indices, ini_val,
                                opt_dist, cost_function,

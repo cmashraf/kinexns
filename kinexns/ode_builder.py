@@ -257,14 +257,10 @@ def get_forward_rate_constants(parameters, temp, convert):
                         A list of forward rate constants (k_matrix)
     """
     factor = 0
-    if convert == 'cal':
-        factor = CAL_JL
-    if convert == 'kcal':
-        factor = KCAL_JL
-    if convert == 'KJ':
-        factor = 1000
-    if convert == 'J':
-        factor = 1
+    convert_val = {'cal': CAL_JL, 'kcal': KCAL_JL,
+                   'hartrees': HT_JL, 'KJ': 1000, 'J': 1}
+    factor = convert_val.get(energy_conv)
+
     forward_rates = (eval(parameters[0]) * temp ** eval(parameters[1]) *
                      np.exp((- eval(parameters[2]) * factor / (GAS_CONST * temp))))
     return forward_rates

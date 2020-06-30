@@ -13,3 +13,23 @@ Complete example of handling **Chemkin input files**, building model, solving th
 
 Complete example of handling **user deined input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
 **[Notebooks/example_xylose](https://github.com/cmashraf/kinexns/tree/master/Notebooks/example_xylose)**
+
+-------
+### Software dependencies and license information
+
+**Programming language:**
+Python version 3.7.7 (https://www.python.org)
+
+**Python packages needed:**
+**kinexns** uses basic python packages like NumPy, Pandas etc. Also, to perform tasks like solving odes, performing sensitivity analysis and model optimization, kinexns uses other open source python packages like assimulo, SALib and spotpy.
+
+To efficiently solve the system of stiff ODEs, kinexns uses **[assimulo](https://jmodelica.org/assimulo/)** through which it can access the **CVOde class** which provides a connection to the **[Sundials](https://computation.llnl.gov/casc/sundials/main.html)** solver CVode. CVOde is a highly efficient stiff ODE solver developed in Lawrence Livermore National Lab.
+
+To perform sensitivity analysis, kinexns uses **[SALib](https://salib.readthedocs.io/en/latest/)** package that uses Sobol Sensitivity Analysis.
+
+Finaly for parameter optimization, kinexns uses **[spotpy](https://pypi.org/project/spotpy/)**, which is another open source python package that makes various stochastic algorithms available.
+
+The ODE solver that we used for our research is a modified version of DDASAC that is unfortunately not open source.  We chose this solver because it performed the best on the stiff set of ODEs in this model, but future users can modify the code (by replacing our `ddasac_utils.py` module) to use other solvers, such as those in the python package scipy.integrate.
+
+**License information:**
+The MIT License (MIT)

@@ -1,4 +1,4 @@
-## kinexns
+## kinexns (An Open Source Python Package for Chemical Kinetic modeling, Sensitivity Analysis and Optimization)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/cmashraf/kinexns.svg?branch=master)](https://travis-ci.org/cmashraf/kinexns)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cmashraf/kinexns/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cmashraf/kinexns/?branch=master)

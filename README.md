@@ -29,7 +29,6 @@ To perform sensitivity analysis, kinexns uses **[SALib](https://salib.readthedoc
 
 Finaly for parameter optimization, kinexns uses **[spotpy](https://pypi.org/project/spotpy/)**, which is another open source python package that makes various stochastic algorithms available.
 
-The ODE solver that we used for our research is a modified version of DDASAC that is unfortunately not open source.  We chose this solver because it performed the best on the stiff set of ODEs in this model, but future users can modify the code (by replacing our `ddasac_utils.py` module) to use other solvers, such as those in the python package scipy.integrate.
 
 **License information:**
 The MIT License (MIT)

@@ -7,7 +7,7 @@ modules.
 GAS_CONST = 8.314
 PR_ATM = 101325
 KCAL_JL = 4184
-HT_JL = 2625.5
+HT_JL = 2625.5 * 1000
 CAL_JL = 4.18
 #  The cooling rate in *C/min to use if a cool down period is specified
 COOL_RATE = -13

@@ -9,7 +9,7 @@ Chemical kinetic models are usually composed of a set of stiff ordinary differen
 This package can generate the set of ODEs for a kinetic model either through parsing Chemkin input files or by parsing though some user defined files that contains the reactions in SMILES format. Also, this package can parse Chemkin thermo files or get the thermodynamic information through a user provided file to calculate the rate constants for the reactions.
 
 Complete example of handling **Chemkin input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
-(Notebooks/example_chemkin)
+**[Notebooks/example_chemkin](https://github.com/cmashraf/kinexns/tree/master/Notebooks/example_chemkin)**
 
 Complete example of handling **user deined input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
-(Notebooks/example_xylose) 
+**[Notebooks/example_xylose](https://github.com/cmashraf/kinexns/tree/master/Notebooks/example_xylose)**

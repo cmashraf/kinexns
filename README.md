@@ -1,5 +1,15 @@
-## kinexns (An Open Source Python Package for Chemical Kinetic modeling, Sensitivity Analysis and Optimization)
+## kinexns (An Open Source Python Package for Chemical Kinetic Modeling, Sensitivity Analysis and Optimization)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/cmashraf/kinexns.svg?branch=master)](https://travis-ci.org/cmashraf/kinexns)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cmashraf/kinexns/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cmashraf/kinexns/?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/cmashraf/kinexns/badge.svg?branch=master)](https://coveralls.io/github/cmashraf/kinexns?branch=master)
+
+Chemical kinetic models are usually composed of a set of stiff ordinary differential equations (ODEs), where a number of rate parameters have to be estimated to fit with experimental observations. This presents a twofold challenge—firstly, to solve the stiff set of ODEs accurately and efficiently; and secondly, to estimate the model parameters precisely by optimizing the objective function. In recent years, stochastic optimization methods for parameter estimation have gained popularity over the classical optimization methods as the former do not require a reasonable initial guess and have the capability to escape local minima. Here, we developed an open source python package kinexns to efficiently solve the kinetic model using CVode solver, perform sensitivity analysis to determine important model parameters, and optimize the model parameters by using the different stochastic methods. The different algorithms we considered are: Monte Carlo (MC), Latin-Hypercube Sampling (LHS), Maximum Likelihood Estimation (MLE), Markov-Chain Monte-Carlo (MCMC), Shuffled Complex Evolution Algorithm (SCE-UA), Simulated Annealing (SA), RObust Parameter Estimation (ROPE), Artificial Bee Colony (ABC), Fitness Scaled Chaotic Artificial Bee Colony (FSCABC), and Dynamically Dimensioned Search algorithm (DDS). 
+
+This package can generate the set of ODEs for a kinetic model either through parsing Chemkin input files or by parsing though some user defined files that contains the reactions in SMILES format. Also, this package can parse Chemkin thermo files or get the thermodynamic information through a user provided file to calculate the rate constants for the reactions.
+
+Complete example of handling **Chemkin input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
+(Notebooks/example_chemkin)
+
+Complete example of handling **user deined input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
+(Notebooks/example_xylose) 

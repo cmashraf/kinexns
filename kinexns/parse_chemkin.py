@@ -27,7 +27,7 @@ def set_paths_chemkin_files(my_path):
 
     thermo_path = my_path + '/data/thermo.dat'
     smile_path = my_path + '/data/species_smiles.dat'
-    reactionlist_path = my_path + '/reaction.dat'
+    reactionlist_path = my_path + '/data/reaction.dat'
     return thermo_path, smile_path, reactionlist_path
 
 

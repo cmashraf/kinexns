@@ -14,7 +14,7 @@ with open(ver_file) as f:
 opts = dict(name="kinexns",
             maintainer="Chowdhury Ashraf",
             maintainer_email="cmashraf@uw.edu",
-            description="Building and optimizing kinetic models for bio-fuel pyrolysis",
+            description="Building and optimizing kinetic chemical models",
             url="https://github.com/cmashraf/kinexns",
             download_url="https://github.com/cmashraf/kinexns",
             license="MIT",
@@ -25,9 +25,17 @@ opts = dict(name="kinexns",
             version=VERSION,
             packages=PACKAGES,
             package_data=PACKAGE_DATA,
-            install_requires=REQUIRES,
-            requires=REQUIRES)
+            install_requires=['numpy',
+                              'pandas',
+                              'spotpy',
+                              'rdkit',
+                              'matplotlib',
+                              'salib',
+                              'assimulo',
+                              'scipy',
+                             ] ,
+           )
 
 
 if __name__ == '__main__':
-    setup(install_requires=['numpy', 'pandas', 'spotpy', 'matplotlib'])
+    setup(**opts)

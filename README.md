@@ -32,3 +32,10 @@ Finaly for parameter optimization, kinexns uses **[spotpy](https://pypi.org/proj
 
 **License information:**
 The MIT License (MIT)
+
+**Installation**
+1. pip install git+https://github.com/cmashraf/kinexns.git
+2. conda install -c rdkit rdkit
+3. conda install -c conda-forge assimulo=3.1
+
+

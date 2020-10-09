@@ -13,7 +13,7 @@ This package can generate the set of ODEs for a kinetic model either through par
 Complete example of handling **Chemkin input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
 **[Notebooks/example_chemkin](https://github.com/cmashraf/kinexns/tree/master/Notebooks/example_chemkin)**
 
-Complete example of handling **user deined input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
+Complete example of handling **user defined input files**, building model, solving the set of ODES, performing sensitivity analysis and model optimization procedures can be found at 
 **[Notebooks/example_xylose](https://github.com/cmashraf/kinexns/tree/master/Notebooks/example_xylose)**
 
 -------
